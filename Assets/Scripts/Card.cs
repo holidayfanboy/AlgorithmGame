@@ -12,7 +12,7 @@ public class Card : MonoBehaviour
     public TMP_Text numberText;
     private Button button;
     private GameManager gameManager;
-
+    [SerializeField] private GameObject outLine;
     void Awake()
     {
         gameManager = FindObjectOfType<GameManager>();
@@ -39,6 +39,11 @@ public class Card : MonoBehaviour
         {
             Debug.LogError("GameManager not found!");
         }
+    }
+
+    public void ChangeColor(Color newColor)
+    {
+        outLine.GetComponent<Image>().color = newColor;
     }
 
     void OnDestroy()
