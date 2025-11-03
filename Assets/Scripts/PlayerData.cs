@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerBack : MonoBehaviour
+public class PlayerData : MonoBehaviour
 {
     [SerializeField] private int PlayerHandRange;
     public int PlayerHealth;

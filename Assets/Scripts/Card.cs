@@ -43,7 +43,6 @@ public class Card : MonoBehaviour
 
     void OnDestroy()
     {
-        // Clean up listener when destroyed
         if (button != null)
         {
             button.onClick.RemoveListener(OnButtonClick);

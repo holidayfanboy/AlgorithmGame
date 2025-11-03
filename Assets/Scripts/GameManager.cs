@@ -1,24 +1,31 @@
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq; 
+using System.Linq;
+using System;
+using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private GameObject cardPrefab;   // assign your Card prefab (must have Card.cs)
-    [SerializeField] private Transform cardParent;    // UI container / parent for cards
-    [SerializeField] GameObject player;
+    [SerializeField] private GameObject cardPrefab;  
+    [SerializeField] private Transform cardParent;   
+    [SerializeField] GameObject Player;
+    private PlayerData playerDataScript;
     public int startingCardCount = 4;
 
-    public List<int> numbers = new List<int>();      // values for current round (shuffled)
-    public List<Card> spawnedCards = new List<Card>(); // spawned Card instances
+    public List<int> numbers = new List<int>();      
+    public List<Card> spawnedCards = new List<Card>();
+    [SerializeField] private int firstCardIndex = -1;
+    [SerializeField] private int secondCardIndex = -1;
+    [SerializeField] private float cardSwapDuration = 0.5f; 
 
-    void Start()
+
+    void Awake()
     {
         // start first round
         ShuffleAndSpawn(startingCardCount);
+        playerDataScript = Player.GetComponent<PlayerData>();
     }
 
-    // Public: clear existing cards, generate new numbers, spawn them
     public void ShuffleAndSpawn(int count)
     {
         ClearCards();
@@ -26,10 +33,8 @@ public class GameManager : MonoBehaviour
         SpawnCards();
     }
 
-    // Destroy current card gameobjects and clear lists
     public void ClearCards()
     {
-        // destroy all spawned card GameObjects
         for (int i = 0; i < spawnedCards.Count; i++)
         {
             if (spawnedCards[i] != null)
@@ -40,7 +45,6 @@ public class GameManager : MonoBehaviour
         numbers.Clear();
     }
 
-    // Create a list of unique numbers and shuffle them (1..count)
     void GenerateNumbers(int count)
     {
         numbers = Enumerable.Range(1, Mathf.Max(1, count)).ToList();
@@ -60,7 +64,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // Instantiate card prefabs and set their values, then add to spawnedCards
     void SpawnCards()
     {
         for (int i = 0; i < numbers.Count; i++)
@@ -98,10 +101,82 @@ public class GameManager : MonoBehaviour
         if (index != -1)
         {
             Debug.Log("Clicked item at index: " + index);
+            if (firstCardIndex == -1)
+            {
+                firstCardIndex = index;
+                Debug.Log("First Card Selected at index: " + firstCardIndex);
+            }
+            else
+            {
+                secondCardIndex = index;
+                Debug.Log("Second Card Selected at index: " + secondCardIndex);
+                int range = playerDataScript.getPlayerHand();
+                if (range >= Math.Abs(firstCardIndex - secondCardIndex))
+                {
+                    Debug.Log(range);
+                    Debug.Log(Math.Abs(firstCardIndex - secondCardIndex));
+                    SwapCard(firstCardIndex, secondCardIndex);
+                }
+                else
+                {
+                    firstCardIndex = secondCardIndex;
+                    secondCardIndex = -1;
+                }
+            }
         }
         else
         {
             Debug.LogWarning("Clicked card not found in the list!");
         }
+    }
+
+    
+    public void SwapCard(int first, int second)
+    {
+        if (first < 0 || second < 0 || first >= spawnedCards.Count || second >= spawnedCards.Count)
+        {
+            Debug.LogError("Invalid card indices for swap");
+            return;
+        }
+
+        StartCoroutine(AnimateCardSwap(first, second));
+        
+        Card temp = spawnedCards[first];
+        spawnedCards[first] = spawnedCards[second];
+        spawnedCards[second] = temp;
+    }
+
+    private IEnumerator AnimateCardSwap(int firstIndex, int secondIndex)
+    {
+        Transform firstTransform = spawnedCards[firstIndex].transform;
+        Transform secondTransform = spawnedCards[secondIndex].transform;
+        
+        Vector3 firstStartPos = firstTransform.localPosition;
+        Vector3 secondStartPos = secondTransform.localPosition;
+        int firstSiblingIndex = firstTransform.GetSiblingIndex();
+        int secondSiblingIndex = secondTransform.GetSiblingIndex();
+
+        float elapsedTime = 0;
+        while (elapsedTime < cardSwapDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / cardSwapDuration;
+            
+            float smoothT = t * t * (3f - 2f * t);
+            
+            firstTransform.localPosition = Vector3.Lerp(firstStartPos, secondStartPos, smoothT);
+            secondTransform.localPosition = Vector3.Lerp(secondStartPos, firstStartPos, smoothT);
+            
+            yield return null;
+        }
+
+        firstTransform.localPosition = secondStartPos;
+        secondTransform.localPosition = firstStartPos;
+        
+        firstTransform.SetSiblingIndex(secondSiblingIndex);
+        secondTransform.SetSiblingIndex(firstSiblingIndex);
+
+        firstCardIndex = -1;
+        secondCardIndex = -1;
     }
 }
