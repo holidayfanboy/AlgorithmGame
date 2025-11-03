@@ -9,7 +9,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject cardPrefab;
     [SerializeField] private Transform cardParent;
     [SerializeField] GameObject Player;
+    [SerializeField] GameObject dataManager;
+
     private PlayerData playerDataScript;
+    private DataManager dataManagerScript;
     public int startingCardCount = 4;
 
     public List<int> numbers = new List<int>();
@@ -20,14 +23,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int Stage;
     [SerializeField] private int MaxStage = 5;
     private bool isSwapping = false;
-
-    void Awake()
+       void Awake()
     {
         // start first round
         firstCardIndex = -1;
         secondCardIndex = -1;
         ShuffleAndSpawn(startingCardCount);
         playerDataScript = Player.GetComponent<PlayerData>();
+        dataManagerScript = dataManager.GetComponent<DataManager>();
     }
 
     public void ShuffleAndSpawn(int count)
@@ -288,11 +291,13 @@ public class GameManager : MonoBehaviour
             Debug.Log("You Win!");
             if (Stage >= MaxStage)
             {
+                dataManagerScript.UpdateGold(30);
                 Debug.Log("Game Completed! Maximum Stage Reached.");
                 return;
             }
             else
             {
+                dataManagerScript.UpdateGold(10);
                 Stage++;
                 Debug.Log("Advancing to Stage: " + Stage);
                 ShuffleAndSpawn(startingCardCount + Stage - 1);

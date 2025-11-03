@@ -5,12 +5,12 @@ using UnityEngine;
 public class PlayerData : MonoBehaviour
 {
     [SerializeField] private int PlayerHandRange;
-    public int PlayerHealth;
+    public int SkillHand;
+    
 
     void Awake()
     {
         PlayerHandRange = 1;
-        PlayerHealth = 3;
     }
 
     void Update()
