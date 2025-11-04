@@ -4,13 +4,11 @@ using UnityEngine;
 
 public class SkillLayout : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public List<GameObject> skills = new List<GameObject>(5) { null, null, null, null, null };
     void Start()
     {
         
     }
-
-    // Update is called once per frame
     void Update()
     {
         

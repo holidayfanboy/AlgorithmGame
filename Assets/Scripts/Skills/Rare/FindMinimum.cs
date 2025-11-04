@@ -6,6 +6,7 @@ public class FindMinimum : MonoBehaviour
 {
     [SerializeField] private GameManager gameManager;
     private GameManager gameManagerScript;
+    public bool isActive = false;
     void Start()
     {
         gameManager = FindObjectOfType<GameManager>();
@@ -13,11 +14,21 @@ public class FindMinimum : MonoBehaviour
     }
     void Update()
     {
-
+        if (isActive)
+        {
+            ActivateSkill(gameManagerScript.spawnedCards);
+            isActive = false;
+        }
     }
     
     public void ActivateSkill(List<Card> cards) //FindSmallestCard
     {
+        if (gameManagerScript.isSwapping) // ignore clicks while swapping
+        {
+            Debug.Log("Swap in progress - input ignored");
+            return;
+        }
+        
         if (cards == null || cards.Count == 0)
         {
             Debug.LogWarning("Card list is empty or null.");
@@ -29,7 +40,7 @@ public class FindMinimum : MonoBehaviour
 
         for (int i = 1; i < cards.Count; i++)
         {
-            if (cards[i] == null) continue; // Skip null cards
+            if (cards[i] == null) continue; // Skip null cardsx
             if (cards[i].Value < minValue)
             {
                 minValue = cards[i].Value;
