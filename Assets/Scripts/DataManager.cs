@@ -1,39 +1,55 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
+// using System.Collections;
+// using System.Collections.Generic;
+// using UnityEngine;
+// using UnityEngine.UI;
+// using TMPro;
 
-public class DataManager : MonoBehaviour
-{
-    public int goldAmount;
-    public int timePlayed;
-    public int playerHealth;
-    public TMP_Text goldText;
-    public TMP_Text playerHealthText;
+// public class DataManager : MonoBehaviour
+// {
+//     [SerializeField] private PlayerData playerData;
+ 
 
-    void Awake()
-    {
-        playerHealth = 3;
-        goldAmount = 100;
-        UpdateGold(0); 
-        UpdateHealth(0);
-    }
+//     void Awake()
+//     {
+//         if (playerData == null)
+//         {
+//             Debug.LogError("PlayerData not assigned to DataManager!");
+//             return;
+//         }
 
-    void Update()
-    {
-    }
+//         // Initialize UI with current values from PlayerData
+//         RefreshUI();
+//     }
 
-    // Call this method whenever you change the goldAmount
-    public void UpdateGold(int amount)
-    {
-        goldAmount += amount;
-        goldText.text = goldAmount.ToString(); 
-    }
+//     void Update()
+//     {
+        
+//     }
+
+//     // Updates both the PlayerData and UI
+//     public void UpdateGold(int amount)
+//     {
+//         if (playerData == null) return;
+        
+//         playerData.IncreaseGoldAmount(amount);
+//         goldText.text = playerData.getGoldAmount().ToString();
+//     }
     
-    public void UpdateHealth(int amount)
-    {
-        playerHealth += amount;
-        playerHealthText.text = playerHealth.ToString();
-    }
-}
+//     public void UpdateHealth(int amount)
+//     {
+//         if (playerData == null) return;
+        
+//         playerData.IncreasePlayerHealth(amount);
+//         playerHealthText.text = playerData.getPlayerHealth().ToString();
+//     }
+
+//     // Refresh UI displays with current PlayerData values
+//     private void RefreshUI()
+//     {
+//         if (goldText != null)
+//             goldText.text = playerData.getGoldAmount().ToString();
+        
+//         if (playerHealthText != null)
+//             playerHealthText.text = playerData.getPlayerHealth().ToString();
+//     }
+// }

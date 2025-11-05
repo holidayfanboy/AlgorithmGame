@@ -3,17 +3,18 @@ using UnityEngine;
 using System.Linq;
 using System;
 using System.Collections;
+using UnityEngine.UI;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private GameObject cardPrefab;
     [SerializeField] private Transform cardParent;
-    [SerializeField] GameObject Player;
-    [SerializeField] GameObject dataManager;
+    [SerializeField] private PlayerData playerData;
+    [SerializeField] private SkillLayout skillLayout;
 
-    private PlayerData playerDataScript;
-    private DataManager dataManagerScript;
     public int startingCardCount = 4;
+    public bool isActivatingSkills = false;
 
     public List<int> numbers = new List<int>();
     public List<Card> spawnedCards = new List<Card>();
@@ -23,16 +24,36 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int Stage;
     [SerializeField] private int MaxStage = 5;
     public bool isSwapping = false;
-       void Awake()
+    public int timePlayed;
+    public TMP_Text goldText;
+    public TMP_Text playerHealthText;
+
+
+    void Awake()
     {
         // start first round
+        UpdateGold(0);
+        UpdateHealth(0);
         firstCardIndex = -1;
         secondCardIndex = -1;
         ShuffleAndSpawn(startingCardCount);
-        playerDataScript = Player.GetComponent<PlayerData>();
-        dataManagerScript = dataManager.GetComponent<DataManager>();
+        if (playerData == null)
+        {
+            Debug.LogError("PlayerData ScriptableObject not assigned to GameManager!");
+        }
     }
 
+    public void UpdateGold(int amount)
+    {
+        playerData.IncreaseGoldAmount(amount);
+        goldText.text = playerData.getGoldAmount().ToString();
+    }
+
+    public void UpdateHealth(int amount)
+    {
+        playerData.IncreasePlayerHealth(amount);
+        playerHealthText.text = playerData.getPlayerHealth().ToString();
+    }
     public void ShuffleAndSpawn(int count)
     {
         ClearCards();
@@ -93,13 +114,26 @@ public class GameManager : MonoBehaviour
             card.SetValue(numbers[i]);
             spawnedCards.Add(card);
         }
+
+        // After spawning cards, start skill activation sequence
+        if (skillLayout != null)
+        {
+            Debug.Log("Activating Skill after spawning cards");
+            isActivatingSkills = true;
+            skillLayout.ActivateSkill();
+            isActivatingSkills = false;
+        }
+        else
+        {
+            Debug.LogWarning("SkillLayout not assigned to GameManager");
+        }
     }
 
     public void OnItemClicked(GameObject selectedCardObject)
     {
-        if (isSwapping) // ignore clicks while swapping
+        if (isSwapping || isActivatingSkills) // ignore clicks while swapping or activating skills
         {
-            Debug.Log("Swap in progress - input ignored");
+            Debug.Log(isSwapping ? "Swap in progress - input ignored" : "Skills activating - input ignored");
             return;
         }
         Card selectedCard = selectedCardObject.GetComponent<Card>();
@@ -142,7 +176,7 @@ public class GameManager : MonoBehaviour
                 pos.y += 35f; // changed from 20f
                 selectedCard.transform.localPosition = pos;
 
-                int range = playerDataScript.getPlayerHand();
+                int range = playerData.getPlayerHand();
                 if (range >= Math.Abs(firstCardIndex - secondCardIndex))
                 {
                     Debug.Log(range);
@@ -193,7 +227,7 @@ public class GameManager : MonoBehaviour
     private void UpdateSelectableRange(int firstIndex)
     {
         if (firstIndex < 0 || firstIndex >= spawnedCards.Count) return;
-        int range = playerDataScript != null ? playerDataScript.getPlayerHand() : 0;
+        int range = playerData != null ? playerData.getPlayerHand() : 0;
 
         for (int i = 0; i < spawnedCards.Count; i++)
         {
@@ -291,13 +325,13 @@ public class GameManager : MonoBehaviour
             Debug.Log("You Win!");
             if (Stage >= MaxStage)
             {
-                dataManagerScript.UpdateGold(30);
+                UpdateGold(30);
                 Debug.Log("Game Completed! Maximum Stage Reached.");
                 return;
             }
             else
             {
-                dataManagerScript.UpdateGold(10);
+                UpdateGold(10);
                 Stage++;
                 Debug.Log("Advancing to Stage: " + Stage);
                 ShuffleAndSpawn(startingCardCount + Stage - 1);

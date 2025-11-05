@@ -9,23 +9,20 @@ public class FindMinimum : MonoBehaviour
     public bool isActive;
     void Awake()
     {
-        isActive = true;
         gameManager = FindObjectOfType<GameManager>();
         gameManagerScript = gameManager.GetComponent<GameManager>();
-        ActivateSkill(gameManagerScript.spawnedCards);
     }
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) // Detect '1' key press
+        if (isActive)
         {
+            Debug.Log("FindMinimum Skill Activated");
             ActivateSkill(gameManagerScript.spawnedCards);
         }
     }
     
     public void ActivateSkill(List<Card> cards) //FindSmallestCard
-    {
-        if (isActive == false) return;
-        
+    {        
         if (gameManagerScript.isSwapping) // ignore clicks while swapping
         {
             Debug.Log("Swap in progress - input ignored");
