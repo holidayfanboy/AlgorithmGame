@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float cardSwapDuration = 0.05f; 
     [SerializeField] private int Stage;
     [SerializeField] private int MaxStage = 5;
-    private bool isSwapping = false;
+    public bool isSwapping = false;
        void Awake()
     {
         // start first round

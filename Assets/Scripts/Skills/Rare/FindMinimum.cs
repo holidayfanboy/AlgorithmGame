@@ -5,24 +5,27 @@ using UnityEngine;
 public class FindMinimum : MonoBehaviour
 {
     [SerializeField] private GameManager gameManager;
-    private GameManager gameManagerScript;
-    public bool isActive = false;
-    void Start()
+    [SerializeField] private GameManager gameManagerScript;
+    public bool isActive;
+    void Awake()
     {
+        isActive = true;
         gameManager = FindObjectOfType<GameManager>();
         gameManagerScript = gameManager.GetComponent<GameManager>();
+        ActivateSkill(gameManagerScript.spawnedCards);
     }
     void Update()
     {
-        if (isActive)
+        if (Input.GetKeyDown(KeyCode.Alpha1)) // Detect '1' key press
         {
             ActivateSkill(gameManagerScript.spawnedCards);
-            isActive = false;
         }
     }
     
     public void ActivateSkill(List<Card> cards) //FindSmallestCard
     {
+        if (isActive == false) return;
+        
         if (gameManagerScript.isSwapping) // ignore clicks while swapping
         {
             Debug.Log("Swap in progress - input ignored");
@@ -52,5 +55,7 @@ public class FindMinimum : MonoBehaviour
         {
             gameManagerScript.SwapCard(minIndex, 0);
         }
+
+         isActive = false;
     }
 }
