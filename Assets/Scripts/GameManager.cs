@@ -11,7 +11,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject cardPrefab;
     [SerializeField] private Transform cardParent;
     [SerializeField] private PlayerData playerData;
+    [SerializeField] private StageData stageData;
     [SerializeField] private SkillLayout skillLayout;
+
 
     public int startingCardCount = 4;
     public bool isActivatingSkills = false;
@@ -22,7 +24,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int secondCardIndex;
     [SerializeField] private float cardSwapDuration = 1f; 
     [SerializeField] private int Stage;
-    [SerializeField] private int MaxStage = 5;
     public bool isSwapping = false;
     public int timePlayed;
     public TMP_Text goldText;
@@ -345,10 +346,11 @@ public class GameManager : MonoBehaviour
         if (isSorted)
         {
             Debug.Log("You Win!");
-            if (Stage >= MaxStage)
+            if (Stage >= stageData.MaxStage)
             {
                 UpdateGold(30);
                 Debug.Log("Game Completed! Maximum Stage Reached.");
+                stageData.SetStateToShop();
                 return;
             }
             else
