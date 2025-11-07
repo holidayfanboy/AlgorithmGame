@@ -9,6 +9,8 @@ public class PlayerData : ScriptableObject
     public int SkillHand;
     public int goldAmount;
     public int playerHealth;
+    public List<GameObject> ownedSkills = new List<GameObject>();
+
     private void OnEnable()
     {
         // Initialize default values when the asset is created
@@ -50,5 +52,44 @@ public class PlayerData : ScriptableObject
     public void SetSkillHand(int skill)
     {
         SkillHand = skill;
+    }
+
+    // Get all owned skills information
+    public List<GameObject> GetOwnedSkills()
+    {
+        return ownedSkills;
+    }
+
+    // Get count of owned skills
+    public int GetOwnedSkillsCount()
+    {
+        return ownedSkills.Count;
+    }
+
+    // Add a skill to owned skills
+    public void AddSkill(GameObject skill)
+    {
+        if (skill != null && !ownedSkills.Contains(skill))
+        {
+            ownedSkills.Add(skill);
+        }
+    }
+
+    // Remove a skill from owned skills
+    public bool RemoveSkill(GameObject skill)
+    {
+        return ownedSkills.Remove(skill);
+    }
+
+    // Check if player owns a specific skill
+    public bool HasSkill(GameObject skill)
+    {
+        return ownedSkills.Contains(skill);
+    }
+
+    // Clear all owned skills
+    public void ClearOwnedSkills()
+    {
+        ownedSkills.Clear();
     }
 }

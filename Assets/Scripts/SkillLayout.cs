@@ -19,7 +19,7 @@ public class SkillLayout : MonoBehaviour
 
 	// Flag to prevent re-initialization from resetting activated skills
 	private bool isInitialized = false;
-
+	[SerializeField] private PlayerData playerData;
 	private void OnValidate()
 	{
 		// Enforce max of 5 entries and strip nulls in the editor
@@ -58,6 +58,31 @@ public class SkillLayout : MonoBehaviour
 			skillObjects = new List<GameObject>();
 		}
 
+		// First priority: Load owned skills from PlayerData
+		if (playerData != null)
+		{
+			List<GameObject> ownedSkills = playerData.GetOwnedSkills();
+			if (ownedSkills != null && ownedSkills.Count > 0)
+			{
+				skillObjects.Clear(); // Clear existing to use PlayerData skills
+				
+				// Add up to 5 owned skills
+				int skillsToAdd = Mathf.Min(ownedSkills.Count, 5);
+				for (int i = 0; i < skillsToAdd; i++)
+				{
+					if (ownedSkills[i] != null)
+					{
+						// Instantiate the skill prefab as a child of this transform
+						GameObject skillInstance = Instantiate(ownedSkills[i], transform);
+						skillObjects.Add(skillInstance);
+					}
+				}
+				
+				Debug.Log($"SkillLayout: Loaded {skillObjects.Count} skills from PlayerData.");
+			}
+		}
+
+		// Fallback: If still empty, use first 5 children
 		if (skillObjects.Count == 0)
 		{
 			int childCount = Mathf.Min(transform.childCount, 5);
