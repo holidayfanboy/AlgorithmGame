@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
     public List<Card> spawnedCards = new List<Card>();
     [SerializeField] private int firstCardIndex;
     [SerializeField] private int secondCardIndex;
-    [SerializeField] private float cardSwapDuration = 0.05f; 
+    [SerializeField] private float cardSwapDuration = 1f; 
     [SerializeField] private int Stage;
     [SerializeField] private int MaxStage = 5;
     public bool isSwapping = false;
@@ -131,11 +131,19 @@ public class GameManager : MonoBehaviour
 
     public void OnItemClicked(GameObject selectedCardObject)
     {
-        if (isSwapping || isActivatingSkills) // ignore clicks while swapping or activating skills
+        if (isSwapping) // ignore clicks while swapping
         {
-            Debug.Log(isSwapping ? "Swap in progress - input ignored" : "Skills activating - input ignored");
+            Debug.Log("Swap in progress - input ignored");
             return;
         }
+        
+        // Ignore clicks while skills are being activated
+        if (isActivatingSkills)
+        {
+            Debug.Log("Skills activating - input ignored");
+            return;
+        }
+        
         Card selectedCard = selectedCardObject.GetComponent<Card>();
         if (selectedCard == null)
         {
@@ -263,15 +271,24 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator AnimateCardSwap(int firstIndex, int secondIndex)
     {
+        Debug.Log($"[AnimateCardSwap] START - Swapping cards at indices {firstIndex} and {secondIndex}");
+        Debug.Log($"[AnimateCardSwap] Card {firstIndex} value: {spawnedCards[firstIndex].Value}, Card {secondIndex} value: {spawnedCards[secondIndex].Value}");
+        
         Transform firstTransform = spawnedCards[firstIndex].transform;
         Transform secondTransform = spawnedCards[secondIndex].transform;
 
         Vector3 firstStartPos = firstTransform.localPosition;
         Vector3 secondStartPos = secondTransform.localPosition;
+        Debug.Log($"[AnimateCardSwap] First card start pos: {firstStartPos}, Second card start pos: {secondStartPos}");
+        
         int firstSiblingIndex = firstTransform.GetSiblingIndex();
         int secondSiblingIndex = secondTransform.GetSiblingIndex();
+        Debug.Log($"[AnimateCardSwap] First sibling index: {firstSiblingIndex}, Second sibling index: {secondSiblingIndex}");
 
+        Debug.Log($"[AnimateCardSwap] Card swap duration: {cardSwapDuration} seconds");
         float elapsedTime = 0;
+        int frameCount = 0;
+        
         while (elapsedTime < cardSwapDuration)
         {
             elapsedTime += Time.deltaTime;
@@ -282,33 +299,38 @@ public class GameManager : MonoBehaviour
             firstTransform.localPosition = Vector3.Lerp(firstStartPos, secondStartPos, smoothT);
             secondTransform.localPosition = Vector3.Lerp(secondStartPos, firstStartPos, smoothT);
 
+            frameCount++;
             yield return null;
         }
+        
+        Debug.Log($"[AnimateCardSwap] Animation completed in {frameCount} frames over {elapsedTime} seconds");
 
         firstTransform.localPosition = secondStartPos;
         secondTransform.localPosition = firstStartPos;
+        Debug.Log($"[AnimateCardSwap] Final positions set - First: {firstTransform.localPosition}, Second: {secondTransform.localPosition}");
 
         firstTransform.SetSiblingIndex(secondSiblingIndex);
         secondTransform.SetSiblingIndex(firstSiblingIndex);
+        Debug.Log($"[AnimateCardSwap] Sibling indices swapped");
 
         // swap the card references after animation
         Card temp = spawnedCards[firstIndex];
         spawnedCards[firstIndex] = spawnedCards[secondIndex];
         spawnedCards[secondIndex] = temp;
+        Debug.Log($"[AnimateCardSwap] List references swapped - Index {firstIndex} now has value {spawnedCards[firstIndex].Value}, Index {secondIndex} now has value {spawnedCards[secondIndex].Value}");
 
         // mark swap finished so input is allowed again
         isSwapping = false;
-
         firstCardIndex = -1;
         secondCardIndex = -1;
-
         // after swap, clear selectable highlights
         ResetAllCardColorsToRed();
 
+        Debug.Log($"[AnimateCardSwap] END - Calling CheckForWin");
         CheckForWin();
     }
 
-    private void CheckForWin()
+    public void CheckForWin()
     {
         bool isSorted = true;
         for (int i = 0; i < spawnedCards.Count - 1; i++)
@@ -335,7 +357,139 @@ public class GameManager : MonoBehaviour
                 Stage++;
                 Debug.Log("Advancing to Stage: " + Stage);
                 ShuffleAndSpawn(startingCardCount + Stage - 1);
+                
+                // Activate skills after advancing to next stage
+                if (skillLayout != null)
+                {
+                    Debug.Log("Activating skills for new stage");
+                    isActivatingSkills = true;
+                    skillLayout.ActivateSkill();
+                }
             }
+        }
+    }
+
+    public void SkillSwapCard(int first, int second)
+    {
+        if (first < 0 || second < 0 || first >= spawnedCards.Count || second >= spawnedCards.Count)
+        {
+            Debug.LogError("Invalid card indices for swap");
+            return;
+        }
+
+        if (isSwapping) return;
+        isSwapping = true;
+
+        StartCoroutine(SkillAnimateCardSwap(first, second));
+    }
+
+    public IEnumerator SkillAnimateCardSwap(int first, int second)
+    {
+        Debug.Log($"[SkillAnimateCardSwap] START - Swapping cards at indices {first} and {second}");
+        
+        // Wait 0.5 seconds before capturing positions to ensure layout has stabilized
+        yield return new WaitForSeconds(0.5f);
+        Debug.Log("[SkillAnimateCardSwap] Waited 0.5 seconds for layout to stabilize");
+        
+        Transform firstTransform = spawnedCards[first].transform;
+        Transform secondTransform = spawnedCards[second].transform;
+
+        // Get layout group reference
+        UnityEngine.UI.LayoutGroup layoutGroup = cardParent.GetComponent<UnityEngine.UI.LayoutGroup>();
+        
+        // CAPTURE POSITIONS BEFORE DISABLING LAYOUT
+        Vector3 firstStartPos = firstTransform.localPosition;
+        Vector3 secondStartPos = secondTransform.localPosition;
+        
+        Debug.Log($"[SkillAnimateCardSwap] Positions captured BEFORE disabling layout - First: {firstStartPos}, Second: {secondStartPos}");
+
+        // Now disable layout group
+        if (layoutGroup != null)
+        {
+            layoutGroup.enabled = false;
+            Debug.Log("[SkillAnimateCardSwap] Layout group disabled");
+        }
+
+        // Wait one frame for layout to disable
+        yield return null;
+
+        // Restore the captured positions manually
+        firstTransform.localPosition = firstStartPos;
+        secondTransform.localPosition = secondStartPos;
+        
+        Debug.Log($"[SkillAnimateCardSwap] Positions restored after layout disable - First: {firstTransform.localPosition}, Second: {secondTransform.localPosition}");
+        
+        int firstSiblingIndex = firstTransform.GetSiblingIndex();
+        int secondSiblingIndex = secondTransform.GetSiblingIndex();
+
+        float elapsedTime = 0;
+        
+        // Animate the swap
+        while (elapsedTime < cardSwapDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedTime / cardSwapDuration);
+            float smoothT = t * t * (3f - 2f * t);
+
+            firstTransform.localPosition = Vector3.Lerp(firstStartPos, secondStartPos, smoothT);
+            secondTransform.localPosition = Vector3.Lerp(secondStartPos, firstStartPos, smoothT);
+
+            yield return null;
+        }
+
+        // Ensure final positions are exact
+        firstTransform.localPosition = secondStartPos;
+        secondTransform.localPosition = firstStartPos;
+
+        // Swap sibling indices
+        firstTransform.SetSiblingIndex(secondSiblingIndex);
+        secondTransform.SetSiblingIndex(firstSiblingIndex);
+
+        // Swap references in the list
+        Card temp = spawnedCards[first];
+        spawnedCards[first] = spawnedCards[second];
+        spawnedCards[second] = temp;
+        
+        Debug.Log($"[SkillAnimateCardSwap] Swap complete - Index {first} now has value {spawnedCards[first].Value}, Index {second} now has value {spawnedCards[second].Value}");
+
+        // Re-enable layout group
+        if (layoutGroup != null)
+        {
+            layoutGroup.enabled = true;
+            Debug.Log("[SkillAnimateCardSwap] Layout group re-enabled");
+        }
+
+        // Mark swap finished
+        isSwapping = false;
+    }
+
+    public void DeleteCard(int index)
+    {
+        if (index < 0 || index >= spawnedCards.Count)
+        {
+            Debug.LogError($"DeleteCard: Invalid index {index}. Must be between 0 and {spawnedCards.Count - 1}");
+            return;
+        }
+
+        Card cardToDelete = spawnedCards[index];
+        Debug.Log($"DeleteCard: Deleting card at index {index} with value {cardToDelete.Value}");
+
+        // Remove from the list
+        spawnedCards.RemoveAt(index);
+        numbers.RemoveAt(index);
+
+        // Destroy the GameObject
+        Destroy(cardToDelete.gameObject);
+
+        Debug.Log($"DeleteCard: Card deleted. Remaining cards: {spawnedCards.Count}");
+
+        // Re-enable layout group to automatically reposition remaining cards
+        UnityEngine.UI.LayoutGroup layoutGroup = cardParent.GetComponent<UnityEngine.UI.LayoutGroup>();
+        if (layoutGroup != null)
+        {
+            layoutGroup.enabled = false;
+            layoutGroup.enabled = true;
+            Debug.Log("DeleteCard: Layout group refreshed to fill gap from right");
         }
     }
 }

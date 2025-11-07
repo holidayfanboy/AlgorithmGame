@@ -20,32 +20,22 @@ public class SkillLayout : MonoBehaviour
 	// Flag to prevent re-initialization from resetting activated skills
 	private bool isInitialized = false;
 	[SerializeField] private PlayerData playerData;
-	private void OnValidate()
-	{
-		// Enforce max of 5 entries and strip nulls in the editor
-		if (skillObjects != null)
-		{
-			for (int i = skillObjects.Count - 1; i >= 0; i--)
-			{
-				if (skillObjects[i] == null)
-				{
-					skillObjects.RemoveAt(i);
-				}
-			}
-			if (skillObjects.Count > 5)
-			{
-				skillObjects.RemoveRange(5, skillObjects.Count - 5);
-			}
-		}
-	}
+    [SerializeField] private GameManager gameManager; // Add reference to GameManager
+    private bool isActivatingSkills = false;
 
-	private void Awake()
+    private void Awake()
 	{
 		// Only build lists once in Awake to prevent resetting active skills
 		if (!isInitialized)
 		{
 			BuildLists();
 			isInitialized = true;
+		}
+		
+		// Find GameManager if not assigned
+		if (gameManager == null)
+		{
+			gameManager = FindObjectOfType<GameManager>();
 		}
 	}
 
@@ -130,47 +120,76 @@ public class SkillLayout : MonoBehaviour
 		Debug.Log($"SkillLayout initialized: {skillObjects.Count} objects, {scriptList.Count} skill scripts collected.");
 	}
 
-	// Public API: sequentially activates each collected skill script's isActive = true
-	public void ActivateSkill()
+	// Public API: activates ALL collected skill scripts' isActive = true with 0.5s delay between each
+    public void ActivateSkill()
     {
-		// Ensure initialization before first use
-		if (!isInitialized)
-		{
-			BuildLists();
-			isInitialized = true;
-		}
+        // Ensure initialization before first use
+        if (!isInitialized)
+        {
+            BuildLists();
+            isInitialized = true;
+        }
 
-		// If nothing collected, warn and return
-		if (scriptList.Count == 0)
-		{
-			Debug.LogWarning("SkillLayout: No skill scripts found to activate.");
-			return;
-		}
+        // If nothing collected, warn and return
+        if (scriptList.Count == 0)
+        {
+            Debug.LogWarning("SkillLayout: No skill scripts found to activate.");
+            return;
+        }
 
-		if (currentScriptIndex >= scriptList.Count)
-		{
-			Debug.Log("SkillLayout: All skills have already been activated.");
-			return;
-		}
+        // Start coroutine to activate scripts with delay
+        StartCoroutine(ActivateSkillsWithDelay());
+    }
 
-		var script = scriptList[currentScriptIndex];
-		if (script == null)
-		{
-			Debug.LogWarning($"SkillLayout: Script at index {currentScriptIndex} is null. Skipping.");
-			currentScriptIndex++;
-			ActivateSkill(); // try next
-			return;
-		}
+    // Coroutine to activate all scripts with 0.5 second delay between each
+    private IEnumerator ActivateSkillsWithDelay()
+    {
+        // Disable input during skill activation
+        isActivatingSkills = true;
+        if (gameManager != null)
+        {
+            gameManager.isActivatingSkills = true;
+            Debug.Log("SkillLayout: Input disabled during skill activation.");
+        }
 
-		SetIsActive(script, true);
-		Debug.Log($"SkillLayout: Activated skill {currentScriptIndex + 1}/{scriptList.Count} - {script.GetType().Name}");
-		currentScriptIndex++;
-	}
+        int activatedCount = 0;
+        for (int i = 0; i < scriptList.Count; i++)
+        {
+            var script = scriptList[i];
+            if (script == null)
+            {
+                Debug.LogWarning($"SkillLayout: Script at index {i} is null. Skipping.");
+                continue;
+            }
+
+            SetIsActive(script, true);
+            Debug.Log($"SkillLayout: Activated skill {i + 1}/{scriptList.Count} - {script.GetType().Name}");
+            activatedCount++;
+
+            // Wait 1.5 seconds before activating the next script
+            yield return new WaitForSeconds(1.5f);
+        }
+
+        Debug.Log($"SkillLayout: Activated {activatedCount} total skills.");
+        currentScriptIndex = scriptList.Count;
+        
+        // Re-enable input after all skills are activated
+        isActivatingSkills = false;
+        if (gameManager != null)
+        {
+            gameManager.isActivatingSkills = false;
+            Debug.Log("SkillLayout: Input re-enabled after skill activation.");
+            
+            // Call CheckForWin after all skills are activated
+            gameManager.CheckForWin();
+            Debug.Log("SkillLayout: Called CheckForWin after skill activation.");
+        }
+    }
 
 	// Optional: allow manual refresh if children are spawned later at runtime
 	public void RefreshSkills()
 	{
-		isInitialized = false; // Allow re-initialization
+		isInitialized = false; 
 		BuildLists();
 		isInitialized = true;
 	}

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5975553471405385761}
   - component: {fileID: 3399885653273435009}
   m_Layer: 5
-  m_Name: Skill
+  m_Name: FindMinimum
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

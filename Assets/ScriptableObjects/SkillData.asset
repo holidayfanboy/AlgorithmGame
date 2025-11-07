@@ -17,6 +17,12 @@ MonoBehaviour:
   icon: {fileID: 0}
   cooldown: 0
   power: 0
-  Tag:
+  RareSkills:
   - {fileID: 6451699668437014824, guid: a5c8efad0b28cc844919cf362bb8feb4, type: 3}
-  - {fileID: 0}
+  - {fileID: 6451699668437014824, guid: 8eb300836299f234ba495430aa0df773, type: 3}
+  - {fileID: 6451699668437014824, guid: 66f3cf19561964e42a5ad64c2b8adf32, type: 3}
+  EpicSkills:
+  - {fileID: 6333097776805915200, guid: 3159c9373d0cf244c81539463e57029f, type: 3}
+  LegendarySkills:
+  - {fileID: 5917684723483882544, guid: fe0592fd56a4b3b4cb2589db603fa13d, type: 3}
+  - {fileID: 8020835128756884710, guid: f05d5c0febdd53b47a574b9d2c2c6b76, type: 3}

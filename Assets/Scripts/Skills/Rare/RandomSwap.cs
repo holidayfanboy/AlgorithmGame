@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FindMinimum : MonoBehaviour
+public class RandomSwap : MonoBehaviour
 {
     [SerializeField] private GameManager gameManager;
     [SerializeField] private GameManager gameManagerScript;
@@ -18,7 +18,7 @@ public class FindMinimum : MonoBehaviour
     {
         if (isActive)
         {
-            Debug.Log("FindMinimum Skill Activated");
+            Debug.Log("RandomSwap Skill Activated");
             StartCoroutine(ActivateSkillCoroutine(gameManagerScript.spawnedCards));
             isActive = false; 
         }
@@ -32,31 +32,25 @@ public class FindMinimum : MonoBehaviour
             yield break;
         }
         
-        if (cards == null || cards.Count == 0)
+        if (cards == null || cards.Count < 2)
         {
-            Debug.LogWarning("Card list is empty or null.");
+            Debug.LogWarning("Card list is empty, null, or has less than 2 cards.");
             yield break;
         }
         
-        int minIndex = 0;
-        int minValue = cards[0].Value;
-
-        for (int i = 1; i < cards.Count; i++)
+        // Pick two random indices
+        int firstIndex = Random.Range(0, cards.Count);
+        int secondIndex = Random.Range(0, cards.Count);
+        
+        // Ensure the two indices are different
+        while (secondIndex == firstIndex)
         {
-            if (cards[i] == null) continue;
-            if (cards[i].Value < minValue)
-            {
-                minValue = cards[i].Value;
-                minIndex = i;
-            }
+            secondIndex = Random.Range(0, cards.Count);
         }
-
-        if (minIndex != 0)
-        {
-            gameManagerScript.SkillSwapCard(minIndex, 0); // Changed from SwapCard
-            
-            // Wait for the swap animation to complete
+        
+        Debug.Log($"RandomSwap: Swapping cards at indices {firstIndex} (value: {cards[firstIndex].Value}) and {secondIndex} (value: {cards[secondIndex].Value})");
+        gameManagerScript.SkillSwapCard(firstIndex, secondIndex);
+        // Perform the swap - directly yield the coroutine
             yield return new WaitUntil(() => !gameManagerScript.isSwapping);
-        }
     }
 }

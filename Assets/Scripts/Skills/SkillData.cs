@@ -11,7 +11,9 @@ public class SkillData : ScriptableObject
     public float cooldown;
     public int power;
 
-    public List<GameObject> Tag = new List<GameObject>();
+    public List<GameObject> RareSkills = new List<GameObject>();
+    public List<GameObject> EpicSkills = new List<GameObject>();
+    public List<GameObject> LegendarySkills = new List<GameObject>();
 }
 
 abstract class SkillEffect

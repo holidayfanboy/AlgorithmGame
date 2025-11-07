@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FindMinimum : MonoBehaviour
+public class FindMaximum : MonoBehaviour
 {
     [SerializeField] private GameManager gameManager;
     [SerializeField] private GameManager gameManagerScript;
@@ -13,17 +13,17 @@ public class FindMinimum : MonoBehaviour
         gameManager = FindObjectOfType<GameManager>();
         gameManagerScript = gameManager.GetComponent<GameManager>();
     }
-    
+
     void Update()
     {
         if (isActive)
         {
-            Debug.Log("FindMinimum Skill Activated");
+            Debug.Log("FindMaximum Skill Activated");
             StartCoroutine(ActivateSkillCoroutine(gameManagerScript.spawnedCards));
-            isActive = false; 
+            isActive = false; // prevent multiple activations
         }
     }
-    
+
     private IEnumerator ActivateSkillCoroutine(List<Card> cards)
     {
         if (gameManagerScript.isSwapping) // ignore if already swapping
@@ -38,25 +38,33 @@ public class FindMinimum : MonoBehaviour
             yield break;
         }
         
-        int minIndex = 0;
-        int minValue = cards[0].Value;
+        int maxIndex = 0;
+        int maxValue = cards[0].Value;
 
         for (int i = 1; i < cards.Count; i++)
         {
             if (cards[i] == null) continue;
-            if (cards[i].Value < minValue)
+            if (cards[i].Value > maxValue)
             {
-                minValue = cards[i].Value;
-                minIndex = i;
+                maxValue = cards[i].Value;
+                maxIndex = i;
             }
         }
 
-        if (minIndex != 0)
+        int lastIndex = cards.Count - 1;
+
+        // If the maximum card is not already at the last position, swap it
+        if (maxIndex != lastIndex)
         {
-            gameManagerScript.SkillSwapCard(minIndex, 0); // Changed from SwapCard
+            gameManagerScript.SkillSwapCard(lastIndex, maxIndex); // Changed from SwapCard
+            Debug.Log($"Maximum value card ({maxValue}) moved to position {lastIndex}");
             
             // Wait for the swap animation to complete
             yield return new WaitUntil(() => !gameManagerScript.isSwapping);
+        }
+        else
+        {
+            Debug.Log($"Maximum value card ({maxValue}) is already at position {lastIndex}");
         }
     }
 }
