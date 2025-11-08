@@ -11,8 +11,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject cardPrefab;
     [SerializeField] private Transform cardParent;
     [SerializeField] private PlayerData playerData;
-    [SerializeField] private StageData stageData;
+    [SerializeField] private FirstStageData stageData;
     [SerializeField] private SkillLayout skillLayout;
+    [SerializeField] private EnemyData enemyData;
+    [SerializeField] private HorizontalLayoutNonUI horizontalLayout;
 
 
     public int startingCardCount = 4;
@@ -33,11 +35,14 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         // start first round
+        if (stageData != null)
+            startingCardCount = stageData.GiveCardSize(); // ADDED: get from FirstStageData
+
         UpdateGold(0);
         UpdateHealth(0);
         firstCardIndex = -1;
         secondCardIndex = -1;
-        ShuffleAndSpawn(startingCardCount);
+        ShuffleAndSpawn(startingCardCount); // unchanged call, now uses updated startingCardCount
         if (playerData == null)
         {
             Debug.LogError("PlayerData ScriptableObject not assigned to GameManager!");
@@ -60,6 +65,7 @@ public class GameManager : MonoBehaviour
         ClearCards();
         GenerateNumbers(count);
         SpawnCards();
+        horizontalLayout.SpawnEnemy(count);
     }
 
     public void ClearCards()
@@ -76,7 +82,28 @@ public class GameManager : MonoBehaviour
 
     void GenerateNumbers(int count)
     {
-        numbers = Enumerable.Range(1, Mathf.Max(1, count)).ToList();
+        numbers.Clear();
+
+        int poolMax = Mathf.Max(1, count * 4);
+
+        HashSet<int> picked = new HashSet<int>();
+        int safety = 0;
+        while (picked.Count < count && safety < 100)
+        {
+            int candidate = UnityEngine.Random.Range(1, poolMax + 1);
+            if (!picked.Contains(candidate))
+            {
+                picked.Add(candidate);
+            }
+            else
+            {
+                // already picked, try again
+            }
+            safety++;
+        }
+
+        numbers = picked.ToList();
+
         Shuffle(numbers);
     }
 
@@ -272,6 +299,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator AnimateCardSwap(int firstIndex, int secondIndex)
     {
+        horizontalLayout.EnemySwap(firstIndex, secondIndex);
         Debug.Log($"[AnimateCardSwap] START - Swapping cards at indices {firstIndex} and {secondIndex}");
         Debug.Log($"[AnimateCardSwap] Card {firstIndex} value: {spawnedCards[firstIndex].Value}, Card {secondIndex} value: {spawnedCards[secondIndex].Value}");
         
@@ -349,7 +377,7 @@ public class GameManager : MonoBehaviour
             if (Stage >= stageData.MaxStage)
             {
                 UpdateGold(30);
-                Debug.Log("Game Completed! Maximum Stage Reached.");
+                Debug.Log("Round Completed! Maximum Stage Reached.");
                 stageData.SetStateToShop();
                 return;
             }
@@ -358,8 +386,13 @@ public class GameManager : MonoBehaviour
                 UpdateGold(10);
                 Stage++;
                 Debug.Log("Advancing to Stage: " + Stage);
-                ShuffleAndSpawn(startingCardCount + Stage - 1);
+
+                if (stageData != null)
+                    startingCardCount = stageData.GiveCardSize(); 
                 
+                enemyData.ActivateDeath();
+                ShuffleAndSpawn(startingCardCount);
+
                 // Activate skills after advancing to next stage
                 if (skillLayout != null)
                 {

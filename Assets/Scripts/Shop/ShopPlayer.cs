@@ -10,7 +10,7 @@ public class ShopPlayer : MonoBehaviour
     public TMP_Text goldText;
     public TMP_Text playerHealthText;
     [SerializeField] private PlayerData playerData;
-    [SerializeField] private StageData stage;
+    [SerializeField] private FirstStageData stage;
 
     // Start is called before the first frame update
     void Awake()

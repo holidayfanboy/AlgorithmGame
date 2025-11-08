@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-[CreateAssetMenu(fileName = "StageData", menuName = "ScriptableObjects/StageData")]
-public class StageData : ScriptableObject
+[CreateAssetMenu(fileName = "FirstStageData", menuName = "ScriptableObjects/StageData")]
+public class FirstStageData : ScriptableObject
 {
     public enum State
     {
@@ -17,19 +17,22 @@ public class StageData : ScriptableObject
 
     public int MaxStage;
 
-    public int CurrentRound;
+    public int stageEnd;
+    public List<int> cardSize = new List<int>();
+    public bool isBoss;
 
-    public class RoundInfo
-    {
-        public int stageEnd;
-        public int cardSize;
-        public bool isBoss;
-    };
-
-    public List<RoundInfo> rounds = new List<RoundInfo>();
-    
     private static bool hasInitialized = false;
-    
+
+    public int GiveCardSize()
+    {
+        if (currentStage - 1 < cardSize.Count)
+        {
+            return cardSize[currentStage - 1];
+        }
+        else
+            Debug.LogWarning("StageData: currentStage exceeds cardSize list. Returning default max value 10.");
+        return 10; // Default max value if out of range
+    }
     private void OnEnable()
     {
         // Only initialize once when the game first starts
@@ -47,7 +50,7 @@ public class StageData : ScriptableObject
         currentStage = 1;
         currentRound = 1;
         MaxStage = 3;
-        
+        stageEnd = 6;
         Debug.Log("StageData: Initialized with default values");
     }
 

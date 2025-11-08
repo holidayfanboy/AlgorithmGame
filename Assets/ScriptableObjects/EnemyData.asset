@@ -9,12 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eed71b2cd1b20324089852bd8c8e1b93, type: 3}
-  m_Name: StageData
+  m_Script: {fileID: 11500000, guid: cd4ae8202ffd1644aafa7d50b1d861c3, type: 3}
+  m_Name: EnemyData
   m_EditorClassIdentifier: 
-  state: 0
-  currentStage: 1
-  currentRound: 1
-  Stage: 0
-  MaxStage: 0
-  CurrentRound: 0
+  activateDeath: 0

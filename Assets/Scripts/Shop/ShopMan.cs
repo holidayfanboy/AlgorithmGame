@@ -10,7 +10,7 @@ public class ShopMan : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
     public bool isShopOpen;
     [SerializeField] private GameObject nextUI;
 
-    [SerializeField] private StageData stageData;
+    [SerializeField] private FirstStageData stageData;
 
     void Start()
     {
