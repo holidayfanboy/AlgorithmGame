@@ -21,17 +21,23 @@ public class SellingSkill : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     public GameObject skillObject;
     public TMP_Text skillDescription;
     public GameObject skillName;
-
     public int skillIndex;
 
+    [SerializeField] private ShopPlayer shopPlayer; 
+    [SerializeField] private SkillLayoutShop skillLayoutShop;
     public void Awake()
     {
-        skillIndex = 0;
-        skillRarity = Rarity.Epic;
-        // Hide skill name at start
-        if (skillName != null)
+        if (shopPlayer == null)
         {
+            shopPlayer = FindObjectOfType<ShopPlayer>();
+        }
+
+        if (skillName != null)
             skillName.SetActive(false);
+        
+        if (skillLayoutShop == null)
+        {
+            skillLayoutShop = FindObjectOfType<SkillLayoutShop>();
         }
     }
 
@@ -44,10 +50,7 @@ public class SellingSkill : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (skillName != null)
-        {
             skillName.SetActive(true);
-            Debug.Log("SellingSkill: skillName enabled");
-        }
 
         UpdateSkillDescription();
     }
@@ -56,30 +59,73 @@ public class SellingSkill : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     public void OnPointerExit(PointerEventData eventData)
     {
         if (skillName != null)
-        {
             skillName.SetActive(false);
-            Debug.Log("SellingSkill: skillName disabled");
-        }
     }
 
     private void UpdateSkillDescription()
     {
         if (skillDescription == null)
-        {
             return;
-        }
 
         if (descriptionData == null)
         {
-            Debug.LogWarning("SellingSkill: DescriptionData is not assigned!");
-            skillDescription.text = "No description available\n" + "가격: " + SellPrice.ToString();
+            skillDescription.text = "No description available\n가격: " + SellPrice;
             return;
         }
 
-        // Get description from DescriptionData using skillRarity and skillIndex
         string description = descriptionData.GetDescription(skillRarity, skillIndex);
-        skillDescription.text = description + "\n" + SellPrice.ToString();
-        
-        Debug.Log($"SellingSkill: Set description for {skillRarity} skill at index {skillIndex}: '{description}'");
+        skillDescription.text = description + "\n가격: " + SellPrice;
+    }
+
+    public void SellingSkilltoPlayer()
+    {
+        if (playerData == null)
+        {
+            Debug.LogWarning("SellingSkilltoPlayer: PlayerData missing.");
+            return;
+        }
+        if (skillObject == null)
+        {
+            Debug.LogWarning("SellingSkilltoPlayer: skillObject missing.");
+            return;
+        }
+
+        // Ensure list exists
+        if (playerData.ownedSkills == null)
+        {
+            playerData.ownedSkills = new List<GameObject>();
+        }
+
+        // Capacity check BEFORE spending gold
+        if (playerData.ownedSkills.Count >= playerData.ownedSkillCount)
+        {
+            Debug.Log("SellingSkilltoPlayer: Cannot buy. Owned skills are at capacity.");
+            return;
+        }
+
+        // Check gold
+        int currentGold = playerData.goldAmount;
+        if (currentGold < SellPrice)
+        {
+            Debug.Log("SellingSkilltoPlayer: Not enough gold.");
+            return;
+        }
+
+        // Use ShopPlayer to modify gold
+        if (shopPlayer != null)
+        {
+            shopPlayer.UpdateGold(-SellPrice);
+        }
+        else
+        {
+            Debug.LogWarning("SellingSkilltoPlayer: ShopPlayer missing.");
+            return;
+        }
+
+        playerData.ownedSkills.Add(skillObject);
+        Debug.Log($"SellingSkilltoPlayer: Bought {skillObject.name} for {SellPrice}. Total owned: {playerData.ownedSkills.Count}");
+        skillLayoutShop.Refresh();
+        Destroy(gameObject);
     }
 }
+

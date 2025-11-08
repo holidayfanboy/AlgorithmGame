@@ -132,6 +132,15 @@ public class SkillLayout : MonoBehaviour
         if (scriptList.Count == 0)
         {
             Debug.LogWarning("SkillLayout: No skill scripts found to activate.");
+            
+            // Reset isActivatingSkills flag
+            isActivatingSkills = false;
+            if (gameManager != null)
+            {
+                gameManager.isActivatingSkills = false;
+                Debug.Log("SkillLayout: Input re-enabled (no skills to activate).");
+            }
+            
             return;
         }
 

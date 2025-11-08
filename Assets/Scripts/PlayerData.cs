@@ -10,13 +10,45 @@ public class PlayerData : ScriptableObject
     public int goldAmount;
     public int playerHealth;
     public List<GameObject> ownedSkills = new List<GameObject>();
-
+    public int ownedSkillCount;
+    
+    private static bool hasInitialized = false;
+    
     private void OnEnable()
+    {
+        // Only initialize once when the game first starts
+        if (!hasInitialized)
+        {
+            InitializeDefaultValues();
+            hasInitialized = true;
+        }
+    }
+
+    private void InitializeDefaultValues()
     {
         // Initialize default values when the asset is created
         PlayerHandRange = 1;
         playerHealth = 3;
         goldAmount = 100;
+        ownedSkillCount = 5;
+        
+        // Clear owned skills whenever the game restarts
+        if (ownedSkills == null)
+        {
+            ownedSkills = new List<GameObject>();
+        }
+        else
+        {
+            ownedSkills.Clear();
+        }
+        
+        Debug.Log("PlayerData: Initialized with default values and cleared owned skills");
+    }
+
+    // Call this manually if you want to reset during gameplay
+    public void ResetToDefaults()
+    {
+        InitializeDefaultValues();
     }
 
     public int getPlayerHand()
@@ -43,7 +75,7 @@ public class PlayerData : ScriptableObject
     {
         playerHealth += health;
     }
-    // Add setters to modify values at runtime if needed
+
     public void SetPlayerHandRange(int range)
     {
         PlayerHandRange = range;
@@ -54,19 +86,16 @@ public class PlayerData : ScriptableObject
         SkillHand = skill;
     }
 
-    // Get all owned skills information
     public List<GameObject> GetOwnedSkills()
     {
         return ownedSkills;
     }
 
-    // Get count of owned skills
     public int GetOwnedSkillsCount()
     {
         return ownedSkills.Count;
     }
 
-    // Add a skill to owned skills
     public void AddSkill(GameObject skill)
     {
         if (skill != null && !ownedSkills.Contains(skill))
@@ -75,19 +104,16 @@ public class PlayerData : ScriptableObject
         }
     }
 
-    // Remove a skill from owned skills
     public bool RemoveSkill(GameObject skill)
     {
         return ownedSkills.Remove(skill);
     }
 
-    // Check if player owns a specific skill
     public bool HasSkill(GameObject skill)
     {
         return ownedSkills.Contains(skill);
     }
 
-    // Clear all owned skills
     public void ClearOwnedSkills()
     {
         ownedSkills.Clear();

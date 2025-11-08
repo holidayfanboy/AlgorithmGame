@@ -11,6 +11,7 @@ public class SkillData : ScriptableObject
     public float cooldown;
     public int power;
     public int price;
+    public int lifeCost;
     public int rareSellPrice = 50;
     public int epicSellPrice = 100;
     public int legendarySellPrice = 250;
@@ -18,31 +19,55 @@ public class SkillData : ScriptableObject
     public List<GameObject> RareSkills = new List<GameObject>();
     public List<GameObject> EpicSkills = new List<GameObject>();
     public List<GameObject> LegendarySkills = new List<GameObject>();
+    
+    private static bool hasInitialized = false;
+    
+    private void OnEnable()
+    {
+        // Only initialize once when the game first starts
+        if (!hasInitialized)
+        {
+            InitializeDefaultValues();
+            hasInitialized = true;
+        }
+    }
+
+    private void InitializeDefaultValues()
+    {
+        // Initialize default prices if needed
+        if (rareSellPrice == 0) rareSellPrice = 50;
+        if (epicSellPrice == 0) epicSellPrice = 100;
+        if (legendarySellPrice == 0) legendarySellPrice = 250;
+        
+        Debug.Log("SkillData: Initialized with default values");
+    }
+
+    // Call this manually if you want to reset during gameplay
+    public void ResetToDefaults()
+    {
+        InitializeDefaultValues();
+    }
 
     public GameObject GiveOneSellSkill()
     {
-        // Generate a random number between 0 and 100
         float randomValue = Random.Range(0f, 100f);
 
         List<GameObject> selectedList = null;
         SellingSkill.Rarity selectedRarity = SellingSkill.Rarity.Rare;
         int selectedPrice = rareSellPrice;
 
-        // 70% chance for Rare (0-70)
         if (randomValue < 70f)
         {
             selectedList = RareSkills;
             selectedRarity = SellingSkill.Rarity.Rare;
             selectedPrice = rareSellPrice;
         }
-        // 20% chance for Epic (70-90)
         else if (randomValue < 90f)
         {
             selectedList = EpicSkills;
             selectedRarity = SellingSkill.Rarity.Epic;
             selectedPrice = epicSellPrice;
         }
-        // 10% chance for Legendary (90-100)
         else
         {
             selectedList = LegendarySkills;
@@ -50,44 +75,44 @@ public class SkillData : ScriptableObject
             selectedPrice = legendarySellPrice;
         }
 
-        // Check if the selected list is empty
         if (selectedList == null || selectedList.Count == 0)
         {
-            Debug.LogWarning($"GiveOneSellSkill: {selectedRarity} skill list is empty!");
+            Debug.LogWarning($"GiveOneSellSkill: {selectedRarity} list empty");
             return null;
         }
 
-        // Pick a random skill from the selected list
         int randomIndex = Random.Range(0, selectedList.Count);
         GameObject selectedSkill = selectedList[randomIndex];
 
-        // Instantiate the selling skill prefab
         if (sellingSkillPrefab == null)
         {
-            Debug.LogError("GiveOneSellSkill: sellingSkillPrefab is not assigned!");
+            Debug.LogError("GiveOneSellSkill: sellingSkillPrefab missing");
             return null;
         }
 
         GameObject sellingSkillInstance = Instantiate(sellingSkillPrefab);
-        SellingSkill sellingSkillComponent = sellingSkillInstance.GetComponent<SellingSkill>();
+        var sellingSkillComponent = sellingSkillInstance.GetComponent<SellingSkill>();
 
-        if (sellingSkillComponent != null)
+        if (sellingSkillComponent == null)
         {
-            // Set the properties on the SellingSkill component
-            sellingSkillComponent.SellPrice = selectedPrice;
-            sellingSkillComponent.skillRarity = selectedRarity;
-            sellingSkillComponent.skillObject = selectedSkill;
-
-            Debug.Log($"GiveOneSellSkill: Created {selectedRarity} skill - {selectedSkill.name} with price {selectedPrice}");
-        }
-        else
-        {
-            Debug.LogError("GiveOneSellSkill: sellingSkillPrefab does not have SellingSkill component!");
+            Debug.LogError("GiveOneSellSkill: prefab lacks SellingSkill component");
             Destroy(sellingSkillInstance);
             return null;
         }
 
+        sellingSkillComponent.SellPrice = selectedPrice;
+        sellingSkillComponent.skillRarity = selectedRarity;
+        sellingSkillComponent.skillObject = selectedSkill;
+        sellingSkillComponent.skillIndex = randomIndex;
+
+        Debug.Log($"GiveOneSellSkill: {selectedRarity} -> {selectedSkill.name} (idx {randomIndex}) price {selectedPrice}");
         return sellingSkillInstance;
+    }
+
+    public void IncreaseLifeCost()
+    {
+        lifeCost *= 2;
+        Debug.Log($"SkillData: Increased lifeCost to {lifeCost}");
     }
 }
 

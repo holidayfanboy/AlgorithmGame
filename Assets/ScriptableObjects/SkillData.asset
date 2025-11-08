@@ -18,10 +18,11 @@ MonoBehaviour:
   cooldown: 0
   power: 0
   price: 0
+  lifeCost: 50
   rareSellPrice: 50
   epicSellPrice: 100
   legendarySellPrice: 250
-  sellingSkillPrefab: {fileID: 0}
+  sellingSkillPrefab: {fileID: 5002076611790641093, guid: 2f1510d9c693f7744be19152e6a384a0, type: 3}
   RareSkills:
   - {fileID: 6451699668437014824, guid: a5c8efad0b28cc844919cf362bb8feb4, type: 3}
   - {fileID: 6451699668437014824, guid: 8eb300836299f234ba495430aa0df773, type: 3}

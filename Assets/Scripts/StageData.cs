@@ -28,13 +28,33 @@ public class StageData : ScriptableObject
 
     public List<RoundInfo> rounds = new List<RoundInfo>();
     
+    private static bool hasInitialized = false;
+    
     private void OnEnable()
+    {
+        // Only initialize once when the game first starts
+        if (!hasInitialized)
+        {
+            InitializeDefaultValues();
+            hasInitialized = true;
+        }
+    }
+
+    private void InitializeDefaultValues()
     {
         // Initialize default values when the asset is created
         state = State.game;
         currentStage = 1;
         currentRound = 1;
         MaxStage = 3;
+        
+        Debug.Log("StageData: Initialized with default values");
+    }
+
+    // Call this manually if you want to reset during gameplay
+    public void ResetToDefaults()
+    {
+        InitializeDefaultValues();
     }
 
     public void SetStateToGame()
