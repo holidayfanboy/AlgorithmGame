@@ -4,8 +4,6 @@ using UnityEngine;
 using System.Reflection;
 
 public class SkillLayout : MonoBehaviour
-
-
 {
 	[Header("Skill Objects (max 5)")]
 	[Tooltip("Assign up to 5 child GameObjects that each contain a skill script (e.g., FindMinimum). If left empty, first 5 children will be used.")]

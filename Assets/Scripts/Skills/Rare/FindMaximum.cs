@@ -7,6 +7,7 @@ public class FindMaximum : MonoBehaviour
     [SerializeField] private GameManager gameManager;
     [SerializeField] private GameManager gameManagerScript;
     public bool isActive;
+    public int sellPrice;
     
     void Awake()
     {

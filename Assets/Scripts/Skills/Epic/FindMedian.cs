@@ -8,6 +8,8 @@ public class FindMedian : MonoBehaviour
     [SerializeField] private GameManager gameManager;
     [SerializeField] private GameManager gameManagerScript;
     public bool isActive;
+    public int sellPrice;
+    public string description = "At Start of the Round,\nFinds the median value card\nand moves it to the middle position.";
     
     void Awake()
     {

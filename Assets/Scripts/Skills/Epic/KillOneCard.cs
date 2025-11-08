@@ -7,7 +7,8 @@ public class KillOneCard : MonoBehaviour
     [SerializeField] private GameManager gameManager;
     [SerializeField] private GameManager gameManagerScript;
     public bool isActive;
-    
+    public int sellPrice;
+
     void Awake()
     {
         gameManager = FindObjectOfType<GameManager>();
