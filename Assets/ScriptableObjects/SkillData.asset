@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7aa85b11674ba4244b1abd355f7b0408, type: 3}
+  m_Name: SkillData
+  m_EditorClassIdentifier: 
+  skillName: 
+  description: 
+  icon: {fileID: 0}
+  cooldown: 0
+  power: 0
+  price: 0
+  lifeCost: 50
+  rareSellPrice: 50
+  epicSellPrice: 100
+  legendarySellPrice: 250
+  sellingSkillPrefab: {fileID: 5002076611790641093, guid: 2f1510d9c693f7744be19152e6a384a0, type: 3}
+  RareSkills:
+  - {fileID: 6451699668437014824, guid: a5c8efad0b28cc844919cf362bb8feb4, type: 3}
+  - {fileID: 6451699668437014824, guid: 8eb300836299f234ba495430aa0df773, type: 3}
+  - {fileID: 6451699668437014824, guid: 66f3cf19561964e42a5ad64c2b8adf32, type: 3}
+  EpicSkills:
+  - {fileID: 6333097776805915200, guid: 3159c9373d0cf244c81539463e57029f, type: 3}
+  - {fileID: 6641375647578803824, guid: 2feb3532cf890764da7a9c7b1cc77388, type: 3}
+  LegendarySkills:
+  - {fileID: 5917684723483882544, guid: fe0592fd56a4b3b4cb2589db603fa13d, type: 3}
+  - {fileID: 8020835128756884710, guid: f05d5c0febdd53b47a574b9d2c2c6b76, type: 3}
