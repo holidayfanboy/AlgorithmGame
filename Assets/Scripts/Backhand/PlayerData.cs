@@ -9,13 +9,24 @@ public class PlayerData : ScriptableObject
     public int SkillHand;
     public int goldAmount;
     public int playerHealth;
+    public bool isMove;
     public List<GameObject> ownedSkills = new List<GameObject>();
     public int ownedSkillCount;
     
     private static bool hasInitialized = false;
+    public void ActivateMove()
+    {
+        isMove = true;
+    }
+
+    public void DeactivateMove()
+    {
+        isMove = false;
+    }
     
     private void OnEnable()
     {
+        isMove = false;
         // Only initialize once when the game first starts
         if (!hasInitialized)
         {

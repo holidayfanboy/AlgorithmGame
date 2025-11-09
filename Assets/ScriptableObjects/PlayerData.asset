@@ -15,6 +15,7 @@ MonoBehaviour:
   PlayerHandRange: 1
   SkillHand: 0
   goldAmount: 100
-  playerHealth: 3
+  playerHealth: 0
+  isMove: 0
   ownedSkills: []
   ownedSkillCount: 5

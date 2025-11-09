@@ -50,6 +50,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b72f359a722b09148b65063eb0136374, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameManager: {fileID: 0}
+  gameManagerScript: {fileID: 0}
+  isActive: 0
+  sellPrice: 0
 --- !u!222 &5355183223352054391
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -78,7 +82,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 528608153, guid: 6c22f6d04d08c3a4c91aa1ff156352fc, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

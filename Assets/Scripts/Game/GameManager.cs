@@ -15,7 +15,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private SkillLayout skillLayout;
     [SerializeField] private EnemyData enemyData;
     [SerializeField] private HorizontalLayoutNonUI horizontalLayout;
-
+    [SerializeField] private TimerScript timerScript;
+    [SerializeField] private PlayerScript playerScript;
 
     public int startingCardCount = 4;
     public bool isActivatingSkills = false;
@@ -43,6 +44,7 @@ public class GameManager : MonoBehaviour
         firstCardIndex = -1;
         secondCardIndex = -1;
         ShuffleAndSpawn(startingCardCount); // unchanged call, now uses updated startingCardCount
+        horizontalLayout.SpawnEnemy(startingCardCount);
         if (playerData == null)
         {
             Debug.LogError("PlayerData ScriptableObject not assigned to GameManager!");
@@ -59,13 +61,19 @@ public class GameManager : MonoBehaviour
     {
         playerData.IncreasePlayerHealth(amount);
         playerHealthText.text = playerData.getPlayerHealth().ToString();
+        
+        // Check if player health reached 0
+        if (playerData.getPlayerHealth() <= 0)
+        {
+            GameOver();
+        }
     }
     public void ShuffleAndSpawn(int count)
     {
         ClearCards();
         GenerateNumbers(count);
         SpawnCards();
-        horizontalLayout.SpawnEnemy(count);
+        timerScript.StartTimer();
     }
 
     public void ClearCards()
@@ -359,6 +367,25 @@ public class GameManager : MonoBehaviour
         CheckForWin();
     }
 
+    public void FailedtoComplete()
+    {
+        Debug.Log("GameManager: Player failed to complete the stage in time.");
+        if (Stage >= stageData.MaxStage)
+        {
+            Debug.Log("Round Completed! Maximum Stage Reached.");
+            StartCoroutine(AttackThenContinue(true));
+            return;
+        }
+        else
+        {
+            Stage++;
+            if (stageData != null)
+            startingCardCount = stageData.GiveCardSize();
+            StartCoroutine(AttackThenContinue());
+        }
+       
+    }
+
     public void CheckForWin()
     {
         bool isSorted = true;
@@ -378,7 +405,7 @@ public class GameManager : MonoBehaviour
             {
                 UpdateGold(30);
                 Debug.Log("Round Completed! Maximum Stage Reached.");
-                stageData.SetStateToShop();
+                StartCoroutine(AttackThenAdvance(true));
                 return;
             }
             else
@@ -388,18 +415,9 @@ public class GameManager : MonoBehaviour
                 Debug.Log("Advancing to Stage: " + Stage);
 
                 if (stageData != null)
-                    startingCardCount = stageData.GiveCardSize(); 
-                
-                enemyData.ActivateDeath();
-                ShuffleAndSpawn(startingCardCount);
-
-                // Activate skills after advancing to next stage
-                if (skillLayout != null)
-                {
-                    Debug.Log("Activating skills for new stage");
-                    isActivatingSkills = true;
-                    skillLayout.ActivateSkill();
-                }
+                    startingCardCount = stageData.GiveCardSize();
+                    
+                StartCoroutine(AttackThenAdvance());
             }
         }
     }
@@ -527,4 +545,111 @@ public class GameManager : MonoBehaviour
             Debug.Log("DeleteCard: Layout group refreshed to fill gap from right");
         }
     }
+    //When Succeeded
+    private IEnumerator AttackThenAdvance(bool goToShopAtEnd = false)
+    {
+        stageData.SetStageSuccess();
+        timerScript.StopTimer();
+        playerScript.StartAttack();
+        
+        yield return new WaitForSeconds(1.4f);
+
+        enemyData.ActivateDeath();
+
+        yield return new WaitForSeconds(2f);
+        playerScript.Idle();
+        enemyData.DeactivateDeath();
+        
+        // If this was the final stage/round, go to shop after finishing the attack/death sequence
+        if (goToShopAtEnd)
+        {
+            stageData.SetStateToShop();
+            yield break;
+        }
+
+        horizontalLayout.SpawnEnemy(startingCardCount);
+        playerData.ActivateMove();
+        yield return new WaitForSeconds(4f);
+        ShuffleAndSpawn(startingCardCount);
+
+        // Activate skills after advancing to next stage
+        if (skillLayout != null)
+        {
+            Debug.Log("Activating skills for new stage");
+            isActivatingSkills = true;
+            skillLayout.ActivateSkill();
+        }
+    }
+    //When Failed
+    private IEnumerator AttackThenContinue(bool goToShopAtEnd = false)
+    {
+
+        stageData.SetStageFail();
+        timerScript.StopTimer();
+        playerScript.StartAttack();
+        
+        yield return new WaitForSeconds(1.4f);
+
+        enemyData.ActivateDeath();
+
+        yield return new WaitForSeconds(2f);
+        playerScript.Idle();
+        enemyData.DeactivateDeath();
+        
+        // If this was the final stage/round, apply fail penalty and go to shop after sequence
+        if (goToShopAtEnd)
+        {
+            UpdateHealth(-1);
+            stageData.SetStateToShop();
+            yield break;
+        }
+        horizontalLayout.SpawnEnemy(startingCardCount);
+        playerData.ActivateMove(); 
+        yield return new WaitForSeconds(2f);
+        ShuffleAndSpawn(startingCardCount);
+        UpdateHealth(-1);
+        
+        if (skillLayout != null)
+        {
+            Debug.Log("Activating skills for new stage");
+            isActivatingSkills = true;
+            skillLayout.ActivateSkill();
+        }
+    }
+    
+    private void GameOver()
+    {
+        Debug.Log("GameManager: GAME OVER - Player health reached 0");
+        
+        // Stop all running coroutines first
+        StopAllCoroutines();
+        
+        // Start the game over sequence
+        StartCoroutine(GameOverSequence());
+    }
+    
+    private IEnumerator GameOverSequence()
+    {
+        // Stop the timer
+        if (timerScript != null)
+            timerScript.StopTimer();
+        
+        // Trigger player death animation
+        if (playerScript != null)
+            playerScript.PlayerDead();
+        
+        // Disable input
+        isSwapping = true; // Prevent any card swapping
+        isActivatingSkills = true; // Prevent skill activation
+        
+        Debug.Log("GameOver: All functions stopped. Waiting 3 seconds before scene transition...");
+        
+        // Wait 3 seconds
+        yield return new WaitForSeconds(3f);
+        
+        // Change to game over scene
+        Debug.Log("GameOver: Loading GameOverScene");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("GameOverScene");
+    }
 }
+  

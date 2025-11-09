@@ -202,7 +202,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -1436039735, guid: f04dd58592d0f7f4f9a7de628b5f8dcd, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -283,13 +283,14 @@ MonoBehaviour:
   playerData: {fileID: 11400000, guid: 5b92e24f56a01c744b38a7ae3e07bef9, type: 2}
   descriptionData: {fileID: 11400000, guid: 343544dad6c25674db9e3b56f639304f, type: 2}
   SellPrice: 0
-  skillRarity: 1
+  skillRarity: 2
   skillObject: {fileID: 6333097776805915200, guid: 3159c9373d0cf244c81539463e57029f, type: 3}
   skillDescription: {fileID: 4264366842062620547}
   skillName: {fileID: 8464834287833759451}
   skillIndex: 0
   shopPlayer: {fileID: 0}
   skillLayoutShop: {fileID: 0}
+  skillImage: {fileID: 0}
 --- !u!1 &8464834287833759451
 GameObject:
   m_ObjectHideFlags: 0

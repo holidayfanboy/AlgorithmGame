@@ -6,6 +6,8 @@ public class EnemyScript : MonoBehaviour
 {
     [SerializeField] private Animator animator;
     [SerializeField] private EnemyData enemyData;
+    private bool hasTriggeredDeath = false;
+
     void Awake()
     {
         if (animator == null)
@@ -17,7 +19,7 @@ public class EnemyScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (enemyData.activateDeath)
+        if (enemyData.activateDeath && !hasTriggeredDeath)
         {
             InitialDeath();
         }
@@ -25,7 +27,14 @@ public class EnemyScript : MonoBehaviour
 
     private void InitialDeath()
     {
-        Debug.Log("Enemy has died.");
+        hasTriggeredDeath = true;
         animator.SetBool("isDead", true);
+        StartCoroutine(DestroyAfterDelay());
+    }
+
+    private IEnumerator DestroyAfterDelay()
+    {
+        yield return new WaitForSeconds(8f);
+        Destroy(gameObject);
     }
 }

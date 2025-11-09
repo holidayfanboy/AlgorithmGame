@@ -25,6 +25,8 @@ public class SellingSkill : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     [SerializeField] private ShopPlayer shopPlayer; 
     [SerializeField] private SkillLayoutShop skillLayoutShop;
+    [SerializeField] private Image skillImage; // Reference to the image component to change color
+    
     public void Awake()
     {
         if (shopPlayer == null)
@@ -38,6 +40,34 @@ public class SellingSkill : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         if (skillLayoutShop == null)
         {
             skillLayoutShop = FindObjectOfType<SkillLayoutShop>();
+        }
+        
+        // Get Image component if not assigned
+        if (skillImage == null)
+        {
+            skillImage = GetComponent<Image>();
+        }
+        
+        // Set color based on rarity
+        SetColorByRarity();
+    }
+    
+    private void SetColorByRarity()
+    {
+        if (skillImage == null)
+            return;
+            
+        switch (skillRarity)
+        {
+            case Rarity.Rare:
+                skillImage.color = Color.green;
+                break;
+            case Rarity.Epic:
+                skillImage.color = Color.red;
+                break;
+            case Rarity.Legendary:
+                // Keep the original color (do nothing)
+                break;
         }
     }
 

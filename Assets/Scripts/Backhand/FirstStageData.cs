@@ -20,9 +20,43 @@ public class FirstStageData : ScriptableObject
     public int stageEnd;
     public List<int> cardSize = new List<int>();
     public bool isBoss;
-
+    public List<float> timeLimits = new List<float>();
     private static bool hasInitialized = false;
 
+    public bool stageSuccess;
+
+    public int GiveMaxStageSize()
+    {
+        return cardSize.Count;
+    }
+    
+    public void SetStageSuccess()
+    {
+        stageSuccess = true;
+    }
+
+    public void SetStageFail()
+    {
+        stageSuccess = false;
+    }
+
+    public void IncreaseStage()
+    {
+        currentStage++;
+    }
+
+    public float GiveTimeLimit()
+    {
+        if (currentStage - 1 < timeLimits.Count)
+        {
+            return timeLimits[currentStage - 1];
+        }
+        else
+        {
+            Debug.LogWarning("StageData: currentStage exceeds timeLimits list. Returning default 10s.");
+            return 10f; // Default time limit if out of range
+        }
+    }
     public int GiveCardSize()
     {
         if (currentStage - 1 < cardSize.Count)

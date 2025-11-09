@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerScript : MonoBehaviour
 {
     [SerializeField] private Animator animator;
+    [SerializeField] private FirstStageData firstStageData;
     private bool moveAfterAttackRunning = false;
     void Start()
     {
@@ -12,11 +13,12 @@ public class PlayerScript : MonoBehaviour
         {
             animator = GetComponent<Animator>();
         }
+        animator.SetBool("isAttack", false);
     }
 
     void Update()
     {
-        StartAttack();
+        
     }
 
     public void StartAttack()
@@ -33,29 +35,55 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
+    public void PlayerDead()
+    {
+        animator.SetBool("isDead", true);
+        animator.SetBool("isAttack", false);
+        animator.SetBool("isDraw", false);
+        animator.SetBool("isHurt", false);
+    }
+
     public void StopAttack()
     {
         animator.SetBool("isAttack", false);
         animator.SetBool("isDraw", true);
+        animator.SetBool("isHurt", false);
+    }
+
+    public void Idle()
+    {
+        animator.SetBool("isAttack", false);
+        animator.SetBool("isDraw", false);
+        animator.SetBool("isHurt", false);
     }
 
     public void StartHurt()
     {
         animator.SetBool("isHurt", true);
         animator.SetBool("isAttack", false);
-    }
-    
-    public void BacktoIdle()
-    {
-        animator.SetBool("isHurt", false);
         animator.SetBool("isDraw", false);
     }
-
     private IEnumerator MoveAfterAttack()
     {
         moveAfterAttackRunning = true;
-        yield return new WaitForSeconds(2.5f);
-        transform.position = new Vector3(7.95f, -1.16f, 0f);
+        yield return new WaitForSeconds(2f);
+        transform.position = new Vector3(transform.position.x + 15.147f, transform.position.y, transform.position.z);
+        CheckWinCondition();
         moveAfterAttackRunning = false;
+    }
+
+    private void CheckWinCondition()
+    {
+        
+        if (firstStageData.stageSuccess == true)
+        {
+            Debug.Log("Won");
+            StopAttack();
+        }
+        else
+        {
+            Debug.Log("Lost");
+            StartHurt();
+        }
     }
 }

@@ -6,6 +6,8 @@ using UnityEngine;
 public class EnemyData : ScriptableObject
 {
     public bool activateDeath;
+
+
     void OnEnable()
     {
         activateDeath = false;
@@ -16,8 +18,15 @@ public class EnemyData : ScriptableObject
 
     }
 
+
     public void ActivateDeath()
     {
         activateDeath = true;
+
+    }
+
+    public void DeactivateDeath()
+    {
+        activateDeath = false;
     }
 }

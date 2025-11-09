@@ -66,7 +66,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 528608153, guid: 6c22f6d04d08c3a4c91aa1ff156352fc, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -91,3 +91,4 @@ MonoBehaviour:
   gameManager: {fileID: 0}
   gameManagerScript: {fileID: 0}
   isActive: 0
+  sellPrice: 0

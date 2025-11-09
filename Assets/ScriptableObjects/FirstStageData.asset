@@ -12,11 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eed71b2cd1b20324089852bd8c8e1b93, type: 3}
   m_Name: FirstStageData
   m_EditorClassIdentifier: 
-  state: 0
-  currentStage: 1
+  state: 1
+  currentStage: 4
   currentRound: 1
   Stage: 0
   MaxStage: 3
   stageEnd: 6
-  cardSize: 0400000005000000050000000600000007000000
+  cardSize: 0400000005000000060000000700000008000000
   isBoss: 0
+  timeLimits:
+  - 10
+  - 10
+  - 9
+  - 9
+  - 9
+  stageSuccess: 1

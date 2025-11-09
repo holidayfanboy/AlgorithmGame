@@ -10,7 +10,10 @@ public class HorizontalLayoutNonUI : MonoBehaviour
     [SerializeField] private GameObject enemyObject;
     [SerializeField] private GameManager gameManager;
     [SerializeField] private List<GameObject> spawnedEnemies = new List<GameObject>();
-    [SerializeField] private AnimationCurve swapCurve = AnimationCurve.EaseInOut(0,0,1,1);
+    [SerializeField] private AnimationCurve swapCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+    [SerializeField] private GameObject player;
+
+    
 
     public IReadOnlyList<GameObject> SpawnedEnemies => spawnedEnemies;
     void Start()
@@ -18,6 +21,7 @@ public class HorizontalLayoutNonUI : MonoBehaviour
         ArrangeChildren();
     }
 
+    
     public void ArrangeChildren()
     {
         int childCount = transform.childCount;
@@ -44,6 +48,12 @@ public class HorizontalLayoutNonUI : MonoBehaviour
 
     public void SpawnEnemy(int count)
     {
+        // Remove all existing enemies from hierarchy (but don't destroy)
+        ClearEnemies();
+
+        // Update layout bounds relative to player before spawning
+        UpdateBoundsFromPlayer();
+
         if (count <= 0)
         {
             Debug.LogWarning("SpawnEnemy called with non-positive count.");
@@ -65,6 +75,33 @@ public class HorizontalLayoutNonUI : MonoBehaviour
         }
 
         ArrangeChildren();
+    }
+
+    // Remove enemies from parent (but don't destroy them)
+    private void ClearEnemies()
+    {
+        foreach (GameObject enemy in spawnedEnemies)
+        {
+            if (enemy != null)
+            {
+                enemy.transform.SetParent(null);
+            }
+        }
+        spawnedEnemies.Clear();
+    }
+
+    // Keep the layout span width but reposition it so startX is at player's X + 2 (in local space)
+    private void UpdateBoundsFromPlayer()
+    {
+        if (player == null) return;
+
+        float width = endX - startX;
+
+        Vector3 worldTarget = new Vector3(player.transform.position.x + 2f, transform.position.y, transform.position.z);
+        float newLocalStartX = transform.InverseTransformPoint(worldTarget).x;
+
+        startX = newLocalStartX;
+        endX = startX + width;
     }
 
     // Rebuild list from current children if manual edits occurred
@@ -132,7 +169,7 @@ public class HorizontalLayoutNonUI : MonoBehaviour
         EnemySwapAnimated(spawnedEnemies[first], spawnedEnemies[second], 0.5f);
     }
 
-    
+
     public void ReorderSpawnedEnemiesLogical()
     {
         spawnedEnemies.RemoveAll(go => go == null);
@@ -149,4 +186,6 @@ public class HorizontalLayoutNonUI : MonoBehaviour
 
         ArrangeChildren();
     }
+    
+
 }
