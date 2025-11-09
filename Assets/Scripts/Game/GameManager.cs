@@ -645,7 +645,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("GameOver: All functions stopped. Waiting 3 seconds before scene transition...");
         
         // Wait 3 seconds
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(4f);
         
         // Change to game over scene
         Debug.Log("GameOver: Loading GameOverScene");
