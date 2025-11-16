@@ -552,7 +552,8 @@ public class GameManager : MonoBehaviour
         timerScript.StopTimer();
         playerScript.StartAttack();
         
-        yield return new WaitForSeconds(1.4f);
+        // Wait for attack animation to complete
+        yield return StartCoroutine(playerScript.WaitForAttackAnimation());
 
         enemyData.ActivateDeath();
 
@@ -588,7 +589,8 @@ public class GameManager : MonoBehaviour
         timerScript.StopTimer();
         playerScript.StartAttack();
         
-        yield return new WaitForSeconds(1.4f);
+        // Wait for attack animation to complete
+        yield return StartCoroutine(playerScript.WaitForAttackAnimation());
 
         enemyData.ActivateDeath();
 
@@ -642,10 +644,10 @@ public class GameManager : MonoBehaviour
         isSwapping = true; // Prevent any card swapping
         isActivatingSkills = true; // Prevent skill activation
         
-        Debug.Log("GameOver: All functions stopped. Waiting 3 seconds before scene transition...");
+        Debug.Log("GameOver: All functions stopped. Waiting for death animation before scene transition...");
         
-        // Wait 3 seconds
-        yield return new WaitForSeconds(4f);
+        // Wait for death animation to complete
+        yield return StartCoroutine(playerScript.WaitForDeathAnimation());
         
         // Change to game over scene
         Debug.Log("GameOver: Loading GameOverScene");

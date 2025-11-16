@@ -37,10 +37,10 @@ public class PlayerScript : MonoBehaviour
 
     public void PlayerDead()
     {
-        animator.SetBool("isDead", true);
         animator.SetBool("isAttack", false);
         animator.SetBool("isDraw", false);
         animator.SetBool("isHurt", false);
+        animator.SetBool("isDead", true);
     }
 
     public void StopAttack()
@@ -84,6 +84,52 @@ public class PlayerScript : MonoBehaviour
         {
             Debug.Log("Lost");
             StartHurt();
+        }
+    }
+    
+    // Wait for the attack animation to complete
+    public IEnumerator WaitForAttackAnimation()
+    {
+        if (animator == null) yield break;
+        
+        // Wait one frame to ensure animation state has updated
+        yield return null;
+        
+        // Wait while attack animation is playing
+        while (animator.GetBool("isAttack"))
+        {
+            AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            
+            // Check if we're in the attack state and if the animation has finished
+            if (stateInfo.IsName("Attack") && stateInfo.normalizedTime >= 1.0f)
+            {
+                yield break;
+            }
+            
+            yield return null;
+        }
+    }
+    
+    // Wait for the death animation to complete
+    public IEnumerator WaitForDeathAnimation()
+    {
+        if (animator == null) yield break;
+        
+        // Wait one frame to ensure animation state has updated
+        yield return null;
+        
+        // Wait while death animation is playing
+        while (animator.GetBool("isDead"))
+        {
+            AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            
+            // Check if we're in the death state and if the animation has finished
+            if (stateInfo.IsName("Dead") && stateInfo.normalizedTime >= 1.0f)
+            {
+                yield break;
+            }
+            
+            yield return null;
         }
     }
 }
