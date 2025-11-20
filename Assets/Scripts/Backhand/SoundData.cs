@@ -23,22 +23,29 @@ public class SoundData : ScriptableObject
         }
     }
     
-    public AudioSource SoundObject;
+    public GameObject SoundObjectPrefab;
+    public AudioClip attackClip;
+    public AudioClip hurtClip;
+    public AudioClip deathClip;
 
     public static void PlaySoundFXClip(AudioClip clip, Vector3 soundPos, float volume)
     {
-        AudioSource a = Instantiate(Instance.SoundObject, soundPos, Quaternion.identity);
+        GameObject soundObj = Instantiate(Instance.SoundObjectPrefab, soundPos, Quaternion.identity);
+        AudioSource a = soundObj.GetComponent<AudioSource>();
         a.clip = clip;
         a.volume = volume;
         a.Play();
+        Destroy(soundObj, clip.length);
     }
 
     public static void PlaySoundFXClip(AudioClip[] clips, Vector3 soundPos, float volume)
     {
         int randClip = Random.Range(0, clips.Length);
-        AudioSource a = Instantiate(Instance.SoundObject, soundPos, Quaternion.identity);
+        GameObject soundObj = Instantiate(Instance.SoundObjectPrefab, soundPos, Quaternion.identity);
+        AudioSource a = soundObj.GetComponent<AudioSource>();
         a.clip = clips[randClip];
         a.volume = volume;
         a.Play();
+        Destroy(soundObj, clips[randClip].length);
     }
 }

@@ -484,6 +484,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shopUI: {fileID: 447492850}
   animator: {fileID: 298980358}
+  shopBackgroundClip: {fileID: 8300000, guid: fa121f61cd818aa4fb7e09d58452a85b, type: 3}
   isShopOpen: 0
   nextUI: {fileID: 516192119}
   stageData: {fileID: 11400000, guid: f6752c4ab966bf445a25f04a286ea5ca, type: 2}

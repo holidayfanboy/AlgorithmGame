@@ -20,7 +20,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_Text stageClearText;
     public int startingCardCount = 4;
     public bool isActivatingSkills = false;
-
+    [SerializeField] private List<AudioClip> backgroundClip;
+    [SerializeField] private List<AudioClip> cardClip;
+    [SerializeField] private AudioClip stageclearClip;
     public List<int> numbers = new List<int>();
     public List<Card> spawnedCards = new List<Card>();
     [SerializeField] private int firstCardIndex;
@@ -44,6 +46,7 @@ public class GameManager : MonoBehaviour
         // start first round
         if (stageData != null)
             startingCardCount = stageData.GiveCardSize(); // ADDED: get from FirstStageData
+        SoundData.PlaySoundFXClip(backgroundClip.ToArray(), transform.position, 0.13f);
         freeHandSwapActive = false;
         UpdateGold(0);
         UpdateHealth(0);
@@ -54,6 +57,15 @@ public class GameManager : MonoBehaviour
         if (playerData == null)
         {
             Debug.LogError("PlayerData ScriptableObject not assigned to GameManager!");
+        }
+    }
+
+    void Update()
+    {
+        // Check for quit key (ESC)
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            QuitGame();
         }
     }
 
@@ -314,6 +326,13 @@ public class GameManager : MonoBehaviour
     private IEnumerator AnimateCardSwap(int firstIndex, int secondIndex)
     {
         horizontalLayout.EnemySwap(firstIndex, secondIndex);
+        
+        // Play card swap sound
+        if (cardClip != null && cardClip.Count > 0)
+        {
+            SoundData.PlaySoundFXClip(cardClip.ToArray(), transform.position, 2.0f);
+        }
+        
         Debug.Log($"[AnimateCardSwap] START - Swapping cards at indices {firstIndex} and {secondIndex}");
         Debug.Log($"[AnimateCardSwap] Card {firstIndex} value: {spawnedCards[firstIndex].Value}, Card {secondIndex} value: {spawnedCards[secondIndex].Value}");
         
@@ -432,6 +451,7 @@ public class GameManager : MonoBehaviour
             {
                 UpdateGold(gameClearGold);
                 Debug.Log("Round Completed! Maximum Stage Reached.");
+                SoundData.PlaySoundFXClip(stageclearClip, transform.position, 0.5f);
                 StartCoroutine(AttackThenAdvance(true));
                 return;
             }
@@ -465,6 +485,12 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator SkillAnimateCardSwap(int first, int second)
     {
+        // Play card swap sound
+        if (cardClip != null)
+        {
+            SoundData.PlaySoundFXClip(cardClip.ToArray(), transform.position, 2.0f);
+        }
+        
         Debug.Log($"[SkillAnimateCardSwap] START - Swapping cards at indices {first} and {second}");
         
         // Wait 0.5 seconds before capturing positions to ensure layout has stabilized
@@ -708,11 +734,87 @@ public class GameManager : MonoBehaviour
         Debug.Log("GameOver: All functions stopped. Waiting for death animation before scene transition...");
         
         // Wait for death animation to complete
-        yield return StartCoroutine(playerScript.WaitForDeathAnimation());
+        yield return new WaitForSeconds(3f);
         
         // Change to game over scene
         Debug.Log("GameOver: Loading GameOverScene");
         UnityEngine.SceneManagement.SceneManager.LoadScene("GameOverScene");
+    }
+    
+    public void ResetGame()
+    {
+        Debug.Log("GameManager: Resetting game to initial state");
+        
+        // Stop all coroutines
+        StopAllCoroutines();
+        
+        // Reset player data
+        if (playerData != null)
+        {
+            playerData.ResetToDefault();
+        }
+        
+        // Reset stage data
+        if (stageData != null)
+        {
+            stageData.ResetToDefault();
+        }
+        
+        // Reset stage counter
+        Stage = 0;
+        
+        // Reset flags
+        isSwapping = false;
+        isActivatingSkills = false;
+        freeHandSwapActive = false;
+        firstCardIndex = -1;
+        secondCardIndex = -1;
+        
+        // Clear cards
+        ClearCards();
+        
+        // Reset UI
+        UpdateGold(0);
+        UpdateHealth(0);
+        
+        // Hide stage clear text if visible
+        if (stageClearText != null)
+        {
+            stageClearText.gameObject.SetActive(false);
+        }
+        
+        // Reset player and timer
+        if (playerScript != null)
+        {
+            playerScript.Idle();
+        }
+        
+        if (timerScript != null)
+        {
+            timerScript.StopTimer();
+        }
+        
+        // Restart from first stage
+        if (stageData != null)
+        {
+            startingCardCount = stageData.GiveCardSize();
+        }
+        
+        ShuffleAndSpawn(startingCardCount);
+        horizontalLayout.SpawnEnemy(startingCardCount);
+        
+        Debug.Log("GameManager: Game reset complete");
+    }
+    
+    public void QuitGame()
+    {
+        Debug.Log("GameManager: Quitting game");
+        
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }
   

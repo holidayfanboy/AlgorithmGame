@@ -12,4 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1032f3b1256b104c90ae456e39df7b1, type: 3}
   m_Name: SoundData
   m_EditorClassIdentifier: 
-  SoundObject: {fileID: 0}
+  SoundObjectPrefab: {fileID: 6383631291814852363, guid: 468abfe24cc6b8547990ffb199737cef, type: 3}
+  attackClip: {fileID: 0}
+  hurtClip: {fileID: 0}
+  deathClip: {fileID: 0}

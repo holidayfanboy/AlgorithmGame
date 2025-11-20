@@ -7,6 +7,7 @@ public class ShopMan : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
 {
     [SerializeField] private GameObject shopUI;
     [SerializeField] private Animator animator;
+    [SerializeField] private AudioClip shopBackgroundClip;
     public bool isShopOpen;
     [SerializeField] private GameObject nextUI;
 
@@ -14,6 +15,7 @@ public class ShopMan : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
 
     void Start()
     {
+        SoundData.PlaySoundFXClip(shopBackgroundClip, transform.position, 0.15f);
         isShopOpen = false;
         if (shopUI != null)
         {

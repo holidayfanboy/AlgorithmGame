@@ -9,9 +9,12 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private GameObject vfxPrefab; // VFX prefab to spawn
     [SerializeField] private Vector3 vfxOffset = Vector3.zero; // Offset from player position
     [SerializeField] private float vfxScale = 2f; // Scale multiplier for VFX
+    [SerializeField] private List<AudioClip> attackClips; // Attack sound effects
+    [SerializeField] private AudioClip hurtClip;
+    [SerializeField] private AudioClip deathClip;
     private Vector3 vfxBasePosition = new Vector3(0.23f, -1.51f, 0f);
     private bool moveAfterAttackRunning = false;
-    private float movePlayerAmount = 15.147f;
+    private float movePlayerAmount = 15.147f; 
     void Start()
     {
         if (animator == null)
@@ -67,6 +70,7 @@ public class PlayerScript : MonoBehaviour
         animator.SetBool("isHurt", true);
         animator.SetBool("isAttack", false);
         animator.SetBool("isDraw", false);
+        SoundData.PlaySoundFXClip(hurtClip, transform.position, 1.0f);
     }
     private IEnumerator MoveAfterAttack()
     {
@@ -78,6 +82,11 @@ public class PlayerScript : MonoBehaviour
         {
             GameObject vfx = Instantiate(vfxPrefab, vfxBasePosition, Quaternion.identity);
             vfx.transform.localScale *= vfxScale;
+        }
+
+        if (attackClips != null && attackClips.Count > 0)
+        {
+            SoundData.PlaySoundFXClip(attackClips.ToArray(), transform.position, 1.0f);
         }
         
         transform.position = new Vector3(transform.position.x + movePlayerAmount, transform.position.y, transform.position.z);
@@ -132,6 +141,7 @@ public class PlayerScript : MonoBehaviour
         // Wait one frame to ensure animation state has updated
         yield return null;
         
+        SoundData.PlaySoundFXClip(deathClip, transform.position, 1.0f);
         // Wait while death animation is playing
         while (animator.GetBool("isDead"))
         {

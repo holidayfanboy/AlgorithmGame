@@ -16,6 +16,8 @@ public class TimerScript : MonoBehaviour
     public bool isTimerFrozen; // For TimeFreeze skill
     private Color originalColor;
     private Color iceColor = new Color(0.5f, 0.8f, 1f); // Light blue/cyan color
+    [SerializeField] private AudioClip timeTickingClip;
+    private bool hasPlayedTickingSound = false;
     
     void Awake()
     {
@@ -49,6 +51,13 @@ public class TimerScript : MonoBehaviour
                 {
                     timeLimit -= Time.deltaTime;
                     timerText.text = timeLimit.ToString("00.00");
+                    
+                    // Play ticking sound when 3 seconds or less remain
+                    if (timeLimit <= 3f && !hasPlayedTickingSound && timeTickingClip != null)
+                    {
+                        SoundData.PlaySoundFXClip(timeTickingClip, transform.position, 1.0f);
+                        hasPlayedTickingSound = true;
+                    }
                 }
             }
         }
@@ -61,6 +70,7 @@ public class TimerScript : MonoBehaviour
         timerRunning = true;
         timeisUp = false;
         isTimerFrozen = false;
+        hasPlayedTickingSound = false;
         timeLimit = firstStageData.GiveTimeLimit();
     }
 
