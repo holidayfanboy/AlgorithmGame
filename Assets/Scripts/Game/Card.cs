@@ -9,6 +9,15 @@ using UnityEngine.EventSystems;
 public class Card : MonoBehaviour
 {
     public int Value { get; private set; }
+
+    enum ColorType
+    {
+        Red,
+        Blue,
+        Green
+    }
+
+    public ColorType colorType;
     public TMP_Text numberText;
     private Button button;
     private GameManager gameManager;
