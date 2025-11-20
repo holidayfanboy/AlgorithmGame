@@ -13,13 +13,28 @@ public class TimerScript : MonoBehaviour
     public bool startTimer;
     public bool timeisUp;
     public bool timerRunning;
+    public bool isTimerFrozen; // For TimeFreeze skill
+    private Color originalColor;
+    private Color iceColor = new Color(0.5f, 0.8f, 1f); // Light blue/cyan color
+    
     void Awake()
     {
+        originalColor = timerText.color;
         StartTimer();
     }
 
     void Update()
     {
+        // Update timer color based on freeze state
+        if (isTimerFrozen)
+        {
+            timerText.color = iceColor;
+        }
+        else
+        {
+            timerText.color = originalColor;
+        }
+        
         if (startTimer)
         {
             if (timeLimit <= 0)
@@ -30,7 +45,7 @@ public class TimerScript : MonoBehaviour
             }
             else
             {
-                if (timerRunning)
+                if (timerRunning && !isTimerFrozen)
                 {
                     timeLimit -= Time.deltaTime;
                     timerText.text = timeLimit.ToString("00.00");
@@ -45,6 +60,7 @@ public class TimerScript : MonoBehaviour
         startTimer = true;
         timerRunning = true;
         timeisUp = false;
+        isTimerFrozen = false;
         timeLimit = firstStageData.GiveTimeLimit();
     }
 

@@ -21,15 +21,19 @@ MonoBehaviour:
   lifeCost: 50
   rareSellPrice: 50
   epicSellPrice: 100
-  legendarySellPrice: 250
+  legendarySellPrice: 150
   sellingSkillPrefab: {fileID: 5002076611790641093, guid: 2f1510d9c693f7744be19152e6a384a0, type: 3}
   RareSkills:
   - {fileID: 6451699668437014824, guid: a5c8efad0b28cc844919cf362bb8feb4, type: 3}
   - {fileID: 6451699668437014824, guid: 8eb300836299f234ba495430aa0df773, type: 3}
   - {fileID: 6451699668437014824, guid: 66f3cf19561964e42a5ad64c2b8adf32, type: 3}
+  - {fileID: 6451699668437014824, guid: 3ba370b0eff71d343a05f94b686c50d2, type: 3}
   EpicSkills:
   - {fileID: 6333097776805915200, guid: 3159c9373d0cf244c81539463e57029f, type: 3}
   - {fileID: 6641375647578803824, guid: 2feb3532cf890764da7a9c7b1cc77388, type: 3}
+  - {fileID: 6641375647578803824, guid: f421dba70518c164db116172ecd6dcd0, type: 3}
+  - {fileID: 6641375647578803824, guid: 3c9dc242571967448b07db89d910a205, type: 3}
   LegendarySkills:
   - {fileID: 5917684723483882544, guid: fe0592fd56a4b3b4cb2589db603fa13d, type: 3}
   - {fileID: 8020835128756884710, guid: f05d5c0febdd53b47a574b9d2c2c6b76, type: 3}
+  - {fileID: 5917684723483882544, guid: aa4f42514f7b02f4ea77ebe50ab5528b, type: 3}

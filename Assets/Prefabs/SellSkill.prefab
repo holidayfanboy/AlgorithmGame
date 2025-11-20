@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3342508355406859177}
   - component: {fileID: 5694260663899671817}
   - component: {fileID: 4264366842062620547}
-  m_Layer: 5
+  m_Layer: 3
   m_Name: TextSkillDescription
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -202,7 +202,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -1436039735, guid: f04dd58592d0f7f4f9a7de628b5f8dcd, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 33ebbc652497d7140b80d2b83687d3aa, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -290,7 +290,7 @@ MonoBehaviour:
   skillIndex: 0
   shopPlayer: {fileID: 0}
   skillLayoutShop: {fileID: 0}
-  skillImage: {fileID: 0}
+  skillImage: {fileID: 169495867640760954}
 --- !u!1 &8464834287833759451
 GameObject:
   m_ObjectHideFlags: 0
@@ -303,7 +303,7 @@ GameObject:
   - component: {fileID: 2382677871965211769}
   - component: {fileID: 2294511160325693235}
   - component: {fileID: 8219292044641196270}
-  m_Layer: 5
+  m_Layer: 3
   m_Name: SkillDescription
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private HorizontalLayoutNonUI horizontalLayout;
     [SerializeField] private TimerScript timerScript;
     [SerializeField] private PlayerScript playerScript;
-
+    [SerializeField] private TMP_Text stageClearText;
     public int startingCardCount = 4;
     public bool isActivatingSkills = false;
 
@@ -32,13 +32,19 @@ public class GameManager : MonoBehaviour
     public TMP_Text goldText;
     public TMP_Text playerHealthText;
 
+    public int stageClearGold = 10;
+    public int gameClearGold = 30;
+    
+    private bool freeHandSwapActive = false;
+    private int originalHandRange = 0;
+
 
     void Awake()
     {
         // start first round
         if (stageData != null)
             startingCardCount = stageData.GiveCardSize(); // ADDED: get from FirstStageData
-
+        freeHandSwapActive = false;
         UpdateGold(0);
         UpdateHealth(0);
         firstCardIndex = -1;
@@ -360,11 +366,32 @@ public class GameManager : MonoBehaviour
         isSwapping = false;
         firstCardIndex = -1;
         secondCardIndex = -1;
+        
+        // If free hand swap was active, restore original hand range after this swap
+        if (freeHandSwapActive)
+        {
+            playerData.SetPlayerHandRange(originalHandRange);
+            freeHandSwapActive = false;
+            Debug.Log($"[AnimateCardSwap] Free hand swap used. Restored hand range to {originalHandRange}");
+        }
+        
         // after swap, clear selectable highlights
         ResetAllCardColorsToRed();
 
         Debug.Log($"[AnimateCardSwap] END - Calling CheckForWin");
         CheckForWin();
+    }
+    
+    // Activate free hand swap - temporarily sets hand range to 10 for one swap
+    public void ActivateFreeHandSwap()
+    {
+        if (!freeHandSwapActive)
+        {
+            originalHandRange = playerData.getPlayerHand();
+            playerData.SetPlayerHandRange(10);
+            freeHandSwapActive = true;
+            Debug.Log($"[FreeHandSwap] Activated. Original range: {originalHandRange}, New range: 10");
+        }
     }
 
     public void FailedtoComplete()
@@ -403,14 +430,14 @@ public class GameManager : MonoBehaviour
             Debug.Log("You Win!");
             if (Stage >= stageData.MaxStage)
             {
-                UpdateGold(30);
+                UpdateGold(gameClearGold);
                 Debug.Log("Round Completed! Maximum Stage Reached.");
                 StartCoroutine(AttackThenAdvance(true));
                 return;
             }
             else
             {
-                UpdateGold(10);
+                UpdateGold(stageClearGold);
                 Stage++;
                 Debug.Log("Advancing to Stage: " + Stage);
 
@@ -548,6 +575,10 @@ public class GameManager : MonoBehaviour
     //When Succeeded
     private IEnumerator AttackThenAdvance(bool goToShopAtEnd = false)
     {
+        // Disable player input during attack sequence
+        isSwapping = true;
+        isActivatingSkills = true;
+        
         stageData.SetStageSuccess();
         timerScript.StopTimer();
         playerScript.StartAttack();
@@ -564,6 +595,15 @@ public class GameManager : MonoBehaviour
         // If this was the final stage/round, go to shop after finishing the attack/death sequence
         if (goToShopAtEnd)
         {
+            // Enable stage clear text
+            if (stageClearText != null)
+            {
+                stageClearText.gameObject.SetActive(true);
+            }
+            
+            // Wait 2 seconds before transitioning to shop
+            yield return new WaitForSeconds(2f);
+            
             stageData.SetStateToShop();
             yield break;
         }
@@ -579,11 +619,18 @@ public class GameManager : MonoBehaviour
             Debug.Log("Activating skills for new stage");
             isActivatingSkills = true;
             skillLayout.ActivateSkill();
+            isActivatingSkills = false;
         }
+        
+        // Re-enable player input after sequence completes
+        isSwapping = false;
     }
     //When Failed
     private IEnumerator AttackThenContinue(bool goToShopAtEnd = false)
     {
+        // Disable player input during attack sequence
+        isSwapping = true;
+        isActivatingSkills = true;
 
         stageData.SetStageFail();
         timerScript.StopTimer();
@@ -602,6 +649,16 @@ public class GameManager : MonoBehaviour
         if (goToShopAtEnd)
         {
             UpdateHealth(-1);
+            
+            // Enable stage clear text
+            if (stageClearText != null)
+            {
+                stageClearText.gameObject.SetActive(true);
+            }
+            
+            // Wait 2 seconds before transitioning to shop
+            yield return new WaitForSeconds(2f);
+            
             stageData.SetStateToShop();
             yield break;
         }
@@ -616,7 +673,11 @@ public class GameManager : MonoBehaviour
             Debug.Log("Activating skills for new stage");
             isActivatingSkills = true;
             skillLayout.ActivateSkill();
+            isActivatingSkills = false;
         }
+        
+        // Re-enable player input after sequence completes
+        isSwapping = false;
     }
     
     private void GameOver()

@@ -49,7 +49,7 @@ public class SellingSkill : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         }
         
         // Set color based on rarity
-        SetColorByRarity();
+       
     }
     
     private void SetColorByRarity()
@@ -66,14 +66,14 @@ public class SellingSkill : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
                 skillImage.color = Color.red;
                 break;
             case Rarity.Legendary:
-                // Keep the original color (do nothing)
+                skillImage.color = Color.yellow;
                 break;
         }
+
     }
 
     void Update()
-    {
-        
+    { SetColorByRarity();
     }
 
     // Called when mouse enters the SellingSkill
@@ -99,12 +99,12 @@ public class SellingSkill : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
         if (descriptionData == null)
         {
-            skillDescription.text = "No description available\n가격: " + SellPrice;
+            skillDescription.text = "No description available\n가격: " + SellPrice + "\n등급: " + skillRarity.ToString();
             return;
         }
 
         string description = descriptionData.GetDescription(skillRarity, skillIndex);
-        skillDescription.text = description + "\n가격: " + SellPrice;
+        skillDescription.text = description + "\n가격: " + SellPrice + "\n등급: " + skillRarity.ToString();
     }
 
     public void SellingSkilltoPlayer()

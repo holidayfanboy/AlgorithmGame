@@ -31,7 +31,6 @@ public class PlayerData : ScriptableObject
         if (!hasInitialized)
         {
             InitializeDefaultValues();
-            hasInitialized = true;
         }
     }
 
@@ -52,7 +51,7 @@ public class PlayerData : ScriptableObject
         {
             ownedSkills.Clear();
         }
-        
+        hasInitialized = true;
         Debug.Log("PlayerData: Initialized with default values and cleared owned skills");
     }
 

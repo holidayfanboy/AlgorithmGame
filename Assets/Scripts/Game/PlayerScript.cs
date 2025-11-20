@@ -6,7 +6,12 @@ public class PlayerScript : MonoBehaviour
 {
     [SerializeField] private Animator animator;
     [SerializeField] private FirstStageData firstStageData;
+    [SerializeField] private GameObject vfxPrefab; // VFX prefab to spawn
+    [SerializeField] private Vector3 vfxOffset = Vector3.zero; // Offset from player position
+    [SerializeField] private float vfxScale = 2f; // Scale multiplier for VFX
+    private Vector3 vfxBasePosition = new Vector3(0.23f, -1.51f, 0f);
     private bool moveAfterAttackRunning = false;
+    private float movePlayerAmount = 15.147f;
     void Start()
     {
         if (animator == null)
@@ -67,7 +72,16 @@ public class PlayerScript : MonoBehaviour
     {
         moveAfterAttackRunning = true;
         yield return new WaitForSeconds(2f);
-        transform.position = new Vector3(transform.position.x + 15.147f, transform.position.y, transform.position.z);
+        
+        // Spawn VFX at player position
+        if (vfxPrefab != null)
+        {
+            GameObject vfx = Instantiate(vfxPrefab, vfxBasePosition, Quaternion.identity);
+            vfx.transform.localScale *= vfxScale;
+        }
+        
+        transform.position = new Vector3(transform.position.x + movePlayerAmount, transform.position.y, transform.position.z);
+        vfxBasePosition.x += movePlayerAmount;
         CheckWinCondition();
         moveAfterAttackRunning = false;
     }

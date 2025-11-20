@@ -14,10 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerHandRange: 1
   SkillHand: 0
-  goldAmount: 60
-  playerHealth: 2
+  goldAmount: 100
+  playerHealth: 3
   isMove: 0
-  ownedSkills:
-  - {fileID: 6333097776805915200, guid: 3159c9373d0cf244c81539463e57029f, type: 3}
-  - {fileID: 5917684723483882544, guid: fe0592fd56a4b3b4cb2589db603fa13d, type: 3}
+  ownedSkills: []
   ownedSkillCount: 5

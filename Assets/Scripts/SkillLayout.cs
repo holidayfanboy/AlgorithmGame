@@ -174,7 +174,7 @@ public class SkillLayout : MonoBehaviour
             activatedCount++;
 
             // Wait 1.5 seconds before activating the next script
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(2f);
         }
 
         Debug.Log($"SkillLayout: Activated {activatedCount} total skills.");

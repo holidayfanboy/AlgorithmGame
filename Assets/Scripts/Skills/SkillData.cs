@@ -56,13 +56,13 @@ public class SkillData : ScriptableObject
         SellingSkill.Rarity selectedRarity = SellingSkill.Rarity.Rare;
         int selectedPrice = rareSellPrice;
 
-        if (randomValue < 70f)
+        if (randomValue < 50f)
         {
             selectedList = RareSkills;
             selectedRarity = SellingSkill.Rarity.Rare;
             selectedPrice = rareSellPrice;
         }
-        else if (randomValue < 90f)
+        else if (randomValue < 80f)
         {
             selectedList = EpicSkills;
             selectedRarity = SellingSkill.Rarity.Epic;

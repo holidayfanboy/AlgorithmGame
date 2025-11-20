@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eed71b2cd1b20324089852bd8c8e1b93, type: 3}
   m_Name: FirstStageData
   m_EditorClassIdentifier: 
-  state: 1
-  currentStage: 4
+  state: 0
+  currentStage: 1
   currentRound: 1
   Stage: 0
   MaxStage: 3
@@ -23,7 +23,7 @@ MonoBehaviour:
   timeLimits:
   - 10
   - 10
-  - 9
-  - 9
-  - 9
+  - 12
+  - 13
+  - 14
   stageSuccess: 1
