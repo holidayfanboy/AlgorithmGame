@@ -61,12 +61,7 @@ public class GameManager : MonoBehaviour
     }
 
     void Update()
-    {
-        // Check for quit key (ESC)
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            QuitGame();
-        }
+    { 
     }
 
     public void UpdateGold(int amount)
@@ -751,17 +746,15 @@ public class GameManager : MonoBehaviour
         // Reset player data
         if (playerData != null)
         {
-            playerData.ResetToDefault();
+            playerData.ResetToDefaults();
         }
         
-        // Reset stage data
+        // Reset stage counter and stage data
         if (stageData != null)
         {
-            stageData.ResetToDefault();
+            stageData.Stage = 0;
+            stageData.stageSuccess = false;
         }
-        
-        // Reset stage counter
-        Stage = 0;
         
         // Reset flags
         isSwapping = false;
@@ -810,11 +803,11 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("GameManager: Quitting game");
         
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-#else
+    #else
         Application.Quit();
-#endif
+    #endif
     }
 }
   
