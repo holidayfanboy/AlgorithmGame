@@ -798,60 +798,60 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("GameManager: Resetting game to initial state");
         
-        // Stop all coroutines
-        StopAllCoroutines();
+        // // Stop all coroutines
+        // StopAllCoroutines();
         
-        // Reset player data
-        if (playerData != null)
-        {
-            playerData.ResetToDefaults();
-        }
+        // // Reset player data
+        // if (playerData != null)
+        // {
+        //     playerData.ResetToDefaults();
+        // }
         
-        // Reset stage counter and stage data
-        if (stageData != null)
-        {
-            stageData.Stage = 0;
-            stageData.stageSuccess = false;
-        }
+        // // Reset stage counter and stage data
+        // if (stageData != null)
+        // {
+        //     stageData.Stage = 0;
+        //     stageData.stageSuccess = false;
+        // }
         
-        // Reset flags
-        isSwapping = false;
-        isActivatingSkills = false;
-        freeHandSwapActive = false;
-        firstCardIndex = -1;
-        secondCardIndex = -1;
+        // // Reset flags
+        // isSwapping = false;
+        // isActivatingSkills = false;
+        // freeHandSwapActive = false;
+        // firstCardIndex = -1;
+        // secondCardIndex = -1;
         
-        // Clear cards
-        ClearCards();
+        // // Clear cards
+        // ClearCards();
         
-        // Reset UI
-        UpdateGold(0);
-        UpdateHealth(0);
+        // // Reset UI
+        // UpdateGold(0);
+        // UpdateHealth(0);
         
-        // Hide stage clear text if visible
-        if (stageClearText != null)
-        {
-            stageClearText.gameObject.SetActive(false);
-        }
+        // // Hide stage clear text if visible
+        // if (stageClearText != null)
+        // {
+        //     stageClearText.gameObject.SetActive(false);
+        // }
         
-        playerScript.Idle();
+        // playerScript.Idle();
 
 
-        if (timerScript != null)
-        {
-            timerScript.StopTimer();
-        }
+        // if (timerScript != null)
+        // {
+        //     timerScript.StopTimer();
+        // }
         
-        // Restart from first stage
-        if (stageData != null)
-        {
-            startingCardCount = stageData.GiveCardSize();
-        }
+        // // Restart from first stage
+        // if (stageData != null)
+        // {
+        //     startingCardCount = stageData.GiveCardSize();
+        // }
         
-        ShuffleAndSpawn(startingCardCount);
-        horizontalLayout.SpawnEnemy(startingCardCount);
+        // ShuffleAndSpawn(startingCardCount);
+        // horizontalLayout.SpawnEnemy(startingCardCount);
         
-        Debug.Log("GameManager: Game reset complete");
+        // Debug.Log("GameManager: Game reset complete");
     }
     
     public void QuitGame()
