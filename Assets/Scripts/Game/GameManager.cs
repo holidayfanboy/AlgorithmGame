@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private HorizontalLayoutNonUI horizontalLayout;
     [SerializeField] private TimerScript timerScript;
     [SerializeField] private PlayerScript playerScript;
+    [SerializeField] private BossPlayerScript bossPlayerScript;
     [SerializeField] private TMP_Text stageClearText;
     public int startingCardCount = 4;
     public bool isActivatingSkills = false;
@@ -107,23 +108,37 @@ public class GameManager : MonoBehaviour
 
         int poolMax = Mathf.Max(1, count * 4);
 
-        HashSet<int> picked = new HashSet<int>();
-        int safety = 0;
-        while (picked.Count < count && safety < 100)
+        // If boss stage, allow duplicates for color sorting challenge
+        if (stageData != null && stageData.isBoss)
         {
-            int candidate = UnityEngine.Random.Range(1, poolMax + 1);
-            if (!picked.Contains(candidate))
+            Debug.Log("Boss stage: Generating numbers with possible duplicates");
+            for (int i = 0; i < count; i++)
             {
-                picked.Add(candidate);
+                int value = UnityEngine.Random.Range(1, poolMax + 1);
+                numbers.Add(value);
             }
-            else
-            {
-                // already picked, try again
-            }
-            safety++;
         }
+        else
+        {
+            // Normal stage: no duplicates
+            HashSet<int> picked = new HashSet<int>();
+            int safety = 0;
+            while (picked.Count < count && safety < 100)
+            {
+                int candidate = UnityEngine.Random.Range(1, poolMax + 1);
+                if (!picked.Contains(candidate))
+                {
+                    picked.Add(candidate);
+                }
+                else
+                {
+                    // already picked, try again
+                }
+                safety++;
+            }
 
-        numbers = picked.ToList();
+            numbers = picked.ToList();
+        }
 
         Shuffle(numbers);
     }
@@ -161,6 +176,16 @@ public class GameManager : MonoBehaviour
             }
 
             card.SetValue(numbers[i]);
+            
+            // If boss stage, assign random color to each card
+            if (stageData != null && stageData.isBoss)
+            {
+                int randomColor = UnityEngine.Random.Range(0, 3); // 0=Red, 1=Blue, 2=Green
+                card.colorType = (Card.ColorType)randomColor;
+                card.UpdateCardColor(); // Apply visual color change
+                Debug.Log($"Boss stage: Card {i} assigned color {card.colorType}");
+            }
+            
             spawnedCards.Add(card);
         }
 
@@ -430,12 +455,38 @@ public class GameManager : MonoBehaviour
     public void CheckForWin()
     {
         bool isSorted = true;
+        
+        // Check number sorting
         for (int i = 0; i < spawnedCards.Count - 1; i++)
         {
             if (spawnedCards[i].Value > spawnedCards[i + 1].Value)
             {
                 isSorted = false;
                 break;
+            }
+        }
+        
+        // If boss stage, also check color sorting (Red -> Blue -> Green)
+        if (isSorted && stageData != null && stageData.isBoss)
+        {
+            Debug.Log("Boss stage: Checking color sorting (Red -> Blue -> Green)");
+            
+            for (int i = 0; i < spawnedCards.Count - 1; i++)
+            {
+                Card currentCard = spawnedCards[i];
+                Card nextCard = spawnedCards[i + 1];
+                
+                // If values are equal, check color order
+                if (currentCard.Value == nextCard.Value)
+                {
+                    // Red < Blue < Green
+                    if (currentCard.colorType > nextCard.colorType)
+                    {
+                        isSorted = false;
+                        Debug.Log($"Color sorting failed at index {i}: {currentCard.colorType} should come before {nextCard.colorType}");
+                        break;
+                    }
+                }
             }
         }
 
@@ -602,15 +653,27 @@ public class GameManager : MonoBehaviour
         
         stageData.SetStageSuccess();
         timerScript.StopTimer();
-        playerScript.StartAttack();
         
-        // Wait for attack animation to complete
-        yield return StartCoroutine(playerScript.WaitForAttackAnimation());
+        // Use bossPlayerScript if playerScript is null
+        if (playerScript != null)
+        {
+            playerScript.StartAttack();
+            yield return StartCoroutine(playerScript.WaitForAttackAnimation());
+        }
+        else if (bossPlayerScript != null)
+        {
+            bossPlayerScript.StartAttack();
+            yield return StartCoroutine(bossPlayerScript.WaitForAttackAnimation());
+        }
 
         enemyData.ActivateDeath();
 
         yield return new WaitForSeconds(2f);
-        playerScript.Idle();
+        
+        if (playerScript != null)
+            playerScript.Idle();
+        else if (bossPlayerScript != null)
+            bossPlayerScript.Idle();
         enemyData.DeactivateDeath();
         
         // If this was the final stage/round, go to shop after finishing the attack/death sequence
@@ -655,15 +718,27 @@ public class GameManager : MonoBehaviour
 
         stageData.SetStageFail();
         timerScript.StopTimer();
-        playerScript.StartAttack();
         
-        // Wait for attack animation to complete
-        yield return StartCoroutine(playerScript.WaitForAttackAnimation());
+        // Use bossPlayerScript if playerScript is null
+        if (playerScript != null)
+        {
+            playerScript.StartAttack();
+            yield return StartCoroutine(playerScript.WaitForAttackAnimation());
+        }
+        else if (bossPlayerScript != null)
+        {
+            bossPlayerScript.StartAttack();
+            yield return StartCoroutine(bossPlayerScript.WaitForAttackAnimation());
+        }
 
         enemyData.ActivateDeath();
 
         yield return new WaitForSeconds(2f);
-        playerScript.Idle();
+        
+        if (playerScript != null)
+            playerScript.Idle();
+        else if (bossPlayerScript != null)
+            bossPlayerScript.Idle();
         enemyData.DeactivateDeath();
         
         // If this was the final stage/round, apply fail penalty and go to shop after sequence
@@ -721,6 +796,8 @@ public class GameManager : MonoBehaviour
         // Trigger player death animation
         if (playerScript != null)
             playerScript.PlayerDead();
+        else if (bossPlayerScript != null)
+            bossPlayerScript.PlayerDead();
         
         // Disable input
         isSwapping = true; // Prevent any card swapping
@@ -780,6 +857,10 @@ public class GameManager : MonoBehaviour
         if (playerScript != null)
         {
             playerScript.Idle();
+        }
+        else if (bossPlayerScript != null)
+        {
+            bossPlayerScript.Idle();
         }
         
         if (timerScript != null)

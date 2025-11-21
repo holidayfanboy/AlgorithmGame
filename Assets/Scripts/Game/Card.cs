@@ -10,7 +10,7 @@ public class Card : MonoBehaviour
 {
     public int Value { get; private set; }
 
-    enum ColorType
+    public enum ColorType
     {
         Red,
         Blue,
@@ -22,6 +22,7 @@ public class Card : MonoBehaviour
     private Button button;
     private GameManager gameManager;
     [SerializeField] private GameObject outLine;
+    [SerializeField] private Image cardImage; // Main card background image
     void Awake()
     {
         gameManager = FindObjectOfType<GameManager>();
@@ -36,6 +37,24 @@ public class Card : MonoBehaviour
         Value = v;
         if (numberText != null)
             numberText.text = v.ToString();
+    }
+
+    public void UpdateCardColor()
+    {
+        if (cardImage == null) return;
+        
+        switch (colorType)
+        {
+            case ColorType.Red:
+                cardImage.color = new Color(1f, 0.3f, 0.3f); // Light red
+                break;
+            case ColorType.Blue:
+                cardImage.color = new Color(0.3f, 0.5f, 1f); // Light blue
+                break;
+            case ColorType.Green:
+                cardImage.color = new Color(0.3f, 1f, 0.3f); // Light green
+                break;
+        }
     }
 
     private void OnButtonClick()

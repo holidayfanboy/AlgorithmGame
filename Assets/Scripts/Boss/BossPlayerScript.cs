@@ -22,6 +22,8 @@ public class BossPlayerScript : MonoBehaviour
             animator = GetComponent<Animator>();
         }
         animator.SetBool("isAttack", false);
+        animator.SetBool("isAttack2", false);
+        animator.SetBool("isAttack3", false);
     }
 
     void Update()
@@ -31,16 +33,37 @@ public class BossPlayerScript : MonoBehaviour
 
     public void StartAttack()
     {
-        // Only trigger when entering attack state to avoid scheduling multiple moves per frame
-        if (!animator.GetBool("isAttack"))
+        // Randomly choose one of three attack animations
+        int randomAttack = Random.Range(0, 3);
+        
+        // Reset all attack bools first
+        animator.SetBool("isAttack", false);
+        animator.SetBool("isAttack2", false);
+        animator.SetBool("isAttack3", false);
+        
+        // Set the randomly selected attack
+        switch (randomAttack)
         {
-            animator.SetBool("isAttack", true);
+            case 0:
+                animator.SetBool("isAttack", true);
+                Debug.Log("Boss using Attack 1");
+                break;
+            case 1:
+                animator.SetBool("isAttack2", true);
+                Debug.Log("Boss using Attack 2");
+                break;
+            case 2:
+                animator.SetBool("isAttack3", true);
+                Debug.Log("Boss using Attack 3");
+                break;
         }
     }
 
     public void PlayerDead()
     {
         animator.SetBool("isAttack", false);
+        animator.SetBool("isAttack2", false);
+        animator.SetBool("isAttack3", false);
         animator.SetBool("isDraw", false);
         animator.SetBool("isHurt", false);
         animator.SetBool("isDead", true);
@@ -49,6 +72,8 @@ public class BossPlayerScript : MonoBehaviour
     public void StopAttack()
     {
         animator.SetBool("isAttack", false);
+        animator.SetBool("isAttack2", false);
+        animator.SetBool("isAttack3", false);
         animator.SetBool("isDraw", true);
         animator.SetBool("isHurt", false);
     }
@@ -56,6 +81,8 @@ public class BossPlayerScript : MonoBehaviour
     public void Idle()
     {
         animator.SetBool("isAttack", false);
+        animator.SetBool("isAttack2", false);
+        animator.SetBool("isAttack3", false);
         animator.SetBool("isDraw", false);
         animator.SetBool("isHurt", false);
     }
@@ -64,6 +91,8 @@ public class BossPlayerScript : MonoBehaviour
     {
         animator.SetBool("isHurt", true);
         animator.SetBool("isAttack", false);
+        animator.SetBool("isAttack2", false);
+        animator.SetBool("isAttack3", false);
         animator.SetBool("isDraw", false);
         SoundData.PlaySoundFXClip(hurtClip, transform.position, 1.0f);
     }
@@ -91,13 +120,14 @@ public class BossPlayerScript : MonoBehaviour
         // Wait one frame to ensure animation state has updated
         yield return null;
         
-        // Wait while attack animation is playing
-        while (animator.GetBool("isAttack"))
+        // Wait while any attack animation is playing
+        while (animator.GetBool("isAttack") || animator.GetBool("isAttack2") || animator.GetBool("isAttack3"))
         {
             AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
             
-            // Check if we're in the attack state and if the animation has finished
-            if (stateInfo.IsName("Attack") && stateInfo.normalizedTime >= 1.0f)
+            // Check if we're in any attack state and if the animation has finished
+            if ((stateInfo.IsName("Attack") || stateInfo.IsName("Attack2") || stateInfo.IsName("Attack3")) 
+                && stateInfo.normalizedTime >= 1.0f)
             {
                 yield break;
             }

@@ -53,8 +53,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ff7e882f7152564ebfd36185082f8be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  colorType: 0
   numberText: {fileID: 5989848755701863478}
   outLine: {fileID: 1096049029659218429}
+  cardImage: {fileID: 7568400186552073348}
 --- !u!222 &1176885539840306623
 CanvasRenderer:
   m_ObjectHideFlags: 0
