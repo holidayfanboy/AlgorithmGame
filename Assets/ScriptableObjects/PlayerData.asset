@@ -15,7 +15,7 @@ MonoBehaviour:
   PlayerHandRange: 1
   firstStageData: {fileID: 11400000, guid: f6752c4ab966bf445a25f04a286ea5ca, type: 2}
   SkillHand: 0
-  goldAmount: 100
+  goldAmount: 10
   playerHealth: 3
   isMove: 0
   ownedSkills: []
