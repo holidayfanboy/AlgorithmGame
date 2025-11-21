@@ -15,7 +15,8 @@ public class PlayerData : ScriptableObject
     public List<GameObject> ownedSkills = new List<GameObject>();
     public int ownedSkillCount;
     
-    private bool hasInitialized = false;
+    private static bool hasInitialized = false; // Changed to static to persist across scene loads
+    
     public void ActivateMove()
     {
         isMove = true;
@@ -28,20 +29,26 @@ public class PlayerData : ScriptableObject
     
     private void OnEnable()
     {
-        if (firstStageData.currentStage == 1)
-        {
-            hasInitialized = false;
-        }
         isMove = false;
-        // Only initialize once when the game first starts
+        
+        // Don't auto-initialize if GameDataManager exists
+        if (GameDataManager.Instance != null)
+        {
+            Debug.Log("PlayerData: GameDataManager detected, skipping auto-initialization");
+            return;
+        }
+        
+        // Only initialize once when the game first starts (fallback if no GameDataManager)
         if (!hasInitialized)
         {
             InitializeDefaultValues();
+            hasInitialized = true;
         }
     }
 
     private void InitializeDefaultValues()
     {
+        Debug.Log("PlayerData: Initializing default values");
         // Initialize default values when the asset is created
         PlayerHandRange = 1;
         playerHealth = 3;

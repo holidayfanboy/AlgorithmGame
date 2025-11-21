@@ -191,7 +191,7 @@ public class GameManager : MonoBehaviour
         // After spawning cards, start skill activation sequence
         if (skillLayout != null)
         {
-            Debug.Log("Activating Skill after spawning cards");
+            //Debug.Log("Activating Skill after spawning cards");
             isActivatingSkills = true;
             skillLayout.ActivateSkill();
             isActivatingSkills = false;
@@ -206,7 +206,7 @@ public class GameManager : MonoBehaviour
     {
         if (isSwapping) // ignore clicks while swapping
         {
-            Debug.Log("Swap in progress - input ignored");
+            //Debug.Log("Swap in progress - input ignored");
             return;
         }
         
@@ -238,7 +238,7 @@ public class GameManager : MonoBehaviour
                 selectedCard.transform.localPosition = pos;
 
                 firstCardIndex = index;
-                Debug.Log("First Card Selected at index: " + firstCardIndex);
+                //Debug.Log("First Card Selected at index: " + firstCardIndex);
 
                 // Highlight selectable range based on PlayerHandRange
                 UpdateSelectableRange(firstCardIndex);
@@ -250,7 +250,7 @@ public class GameManager : MonoBehaviour
                     return;
 
                 secondCardIndex = index;
-                Debug.Log("Second Card Selected at index: " + secondCardIndex);
+                //Debug.Log("Second Card Selected at index: " + secondCardIndex);
 
                 // Move second card up immediately when selected
                 Vector3 pos = selectedCard.transform.localPosition;
@@ -352,21 +352,21 @@ public class GameManager : MonoBehaviour
             SoundData.PlaySoundFXClip(cardClip.ToArray(), transform.position, 2.0f);
         }
         
-        Debug.Log($"[AnimateCardSwap] START - Swapping cards at indices {firstIndex} and {secondIndex}");
-        Debug.Log($"[AnimateCardSwap] Card {firstIndex} value: {spawnedCards[firstIndex].Value}, Card {secondIndex} value: {spawnedCards[secondIndex].Value}");
+        //Debug.Log($"[AnimateCardSwap] START - Swapping cards at indices {firstIndex} and {secondIndex}");
+        //Debug.Log($"[AnimateCardSwap] Card {firstIndex} value: {spawnedCards[firstIndex].Value}, Card {secondIndex} value: {spawnedCards[secondIndex].Value}");
         
         Transform firstTransform = spawnedCards[firstIndex].transform;
         Transform secondTransform = spawnedCards[secondIndex].transform;
 
         Vector3 firstStartPos = firstTransform.localPosition;
         Vector3 secondStartPos = secondTransform.localPosition;
-        Debug.Log($"[AnimateCardSwap] First card start pos: {firstStartPos}, Second card start pos: {secondStartPos}");
+        //Debug.Log($"[AnimateCardSwap] First card start pos: {firstStartPos}, Second card start pos: {secondStartPos}");
         
         int firstSiblingIndex = firstTransform.GetSiblingIndex();
         int secondSiblingIndex = secondTransform.GetSiblingIndex();
-        Debug.Log($"[AnimateCardSwap] First sibling index: {firstSiblingIndex}, Second sibling index: {secondSiblingIndex}");
+        //Debug.Log($"[AnimateCardSwap] First sibling index: {firstSiblingIndex}, Second sibling index: {secondSiblingIndex}");
 
-        Debug.Log($"[AnimateCardSwap] Card swap duration: {cardSwapDuration} seconds");
+        //Debug.Log($"[AnimateCardSwap] Card swap duration: {cardSwapDuration} seconds");
         float elapsedTime = 0;
         int frameCount = 0;
         
@@ -384,21 +384,21 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
         
-        Debug.Log($"[AnimateCardSwap] Animation completed in {frameCount} frames over {elapsedTime} seconds");
+        //Debug.Log($"[AnimateCardSwap] Animation completed in {frameCount} frames over {elapsedTime} seconds");
 
         firstTransform.localPosition = secondStartPos;
         secondTransform.localPosition = firstStartPos;
-        Debug.Log($"[AnimateCardSwap] Final positions set - First: {firstTransform.localPosition}, Second: {secondTransform.localPosition}");
+        //Debug.Log($"[AnimateCardSwap] Final positions set - First: {firstTransform.localPosition}, Second: {secondTransform.localPosition}");
 
         firstTransform.SetSiblingIndex(secondSiblingIndex);
         secondTransform.SetSiblingIndex(firstSiblingIndex);
-        Debug.Log($"[AnimateCardSwap] Sibling indices swapped");
+        //Debug.Log($"[AnimateCardSwap] Sibling indices swapped");
 
         // swap the card references after animation
         Card temp = spawnedCards[firstIndex];
         spawnedCards[firstIndex] = spawnedCards[secondIndex];
         spawnedCards[secondIndex] = temp;
-        Debug.Log($"[AnimateCardSwap] List references swapped - Index {firstIndex} now has value {spawnedCards[firstIndex].Value}, Index {secondIndex} now has value {spawnedCards[secondIndex].Value}");
+        //Debug.Log($"[AnimateCardSwap] List references swapped - Index {firstIndex} now has value {spawnedCards[firstIndex].Value}, Index {secondIndex} now has value {spawnedCards[secondIndex].Value}");
 
         // mark swap finished so input is allowed again
         isSwapping = false;
@@ -410,13 +410,13 @@ public class GameManager : MonoBehaviour
         {
             playerData.SetPlayerHandRange(originalHandRange);
             freeHandSwapActive = false;
-            Debug.Log($"[AnimateCardSwap] Free hand swap used. Restored hand range to {originalHandRange}");
+            //Debug.Log($"[AnimateCardSwap] Free hand swap used. Restored hand range to {originalHandRange}");
         }
         
         // after swap, clear selectable highlights
         ResetAllCardColorsToRed();
 
-        Debug.Log($"[AnimateCardSwap] END - Calling CheckForWin");
+        //Debug.Log($"[AnimateCardSwap] END - Calling CheckForWin");
         CheckForWin();
     }
     
@@ -428,13 +428,13 @@ public class GameManager : MonoBehaviour
             originalHandRange = playerData.getPlayerHand();
             playerData.SetPlayerHandRange(10);
             freeHandSwapActive = true;
-            Debug.Log($"[FreeHandSwap] Activated. Original range: {originalHandRange}, New range: 10");
+            //Debug.Log($"[FreeHandSwap] Activated. Original range: {originalHandRange}, New range: 10");
         }
     }
 
     public void FailedtoComplete()
     {
-        Debug.Log("GameManager: Player failed to complete the stage in time.");
+        //Debug.Log("GameManager: Player failed to complete the stage in time.");
         if (Stage >= stageData.MaxStage)
         {
             Debug.Log("Round Completed! Maximum Stage Reached.");
@@ -491,7 +491,7 @@ public class GameManager : MonoBehaviour
 
         if (isSorted)
         {
-            Debug.Log("You Win!");
+            //Debug.Log("You Win!");
             if (Stage >= stageData.MaxStage)
             {
                 UpdateGold(gameClearGold);
@@ -504,7 +504,7 @@ public class GameManager : MonoBehaviour
             {
                 UpdateGold(stageClearGold);
                 Stage++;
-                Debug.Log("Advancing to Stage: " + Stage);
+                //Debug.Log("Advancing to Stage: " + Stage);
 
                 if (stageData != null)
                     startingCardCount = stageData.GiveCardSize();
@@ -536,11 +536,11 @@ public class GameManager : MonoBehaviour
             SoundData.PlaySoundFXClip(cardClip.ToArray(), transform.position, 2.0f);
         }
         
-        Debug.Log($"[SkillAnimateCardSwap] START - Swapping cards at indices {first} and {second}");
+        //Debug.Log($"[SkillAnimateCardSwap] START - Swapping cards at indices {first} and {second}");
         
         // Wait 0.5 seconds before capturing positions to ensure layout has stabilized
         yield return new WaitForSeconds(0.5f);
-        Debug.Log("[SkillAnimateCardSwap] Waited 0.5 seconds for layout to stabilize");
+        //Debug.Log("[SkillAnimateCardSwap] Waited 0.5 seconds for layout to stabilize");
         
         Transform firstTransform = spawnedCards[first].transform;
         Transform secondTransform = spawnedCards[second].transform;
@@ -552,7 +552,7 @@ public class GameManager : MonoBehaviour
         Vector3 firstStartPos = firstTransform.localPosition;
         Vector3 secondStartPos = secondTransform.localPosition;
         
-        Debug.Log($"[SkillAnimateCardSwap] Positions captured BEFORE disabling layout - First: {firstStartPos}, Second: {secondStartPos}");
+        //Debug.Log($"[SkillAnimateCardSwap] Positions captured BEFORE disabling layout - First: {firstStartPos}, Second: {secondStartPos}");
 
         // Now disable layout group
         if (layoutGroup != null)
@@ -568,7 +568,7 @@ public class GameManager : MonoBehaviour
         firstTransform.localPosition = firstStartPos;
         secondTransform.localPosition = secondStartPos;
         
-        Debug.Log($"[SkillAnimateCardSwap] Positions restored after layout disable - First: {firstTransform.localPosition}, Second: {secondTransform.localPosition}");
+        //Debug.Log($"[SkillAnimateCardSwap] Positions restored after layout disable - First: {firstTransform.localPosition}, Second: {secondTransform.localPosition}");
         
         int firstSiblingIndex = firstTransform.GetSiblingIndex();
         int secondSiblingIndex = secondTransform.GetSiblingIndex();
@@ -601,13 +601,13 @@ public class GameManager : MonoBehaviour
         spawnedCards[first] = spawnedCards[second];
         spawnedCards[second] = temp;
         
-        Debug.Log($"[SkillAnimateCardSwap] Swap complete - Index {first} now has value {spawnedCards[first].Value}, Index {second} now has value {spawnedCards[second].Value}");
+        //Debug.Log($"[SkillAnimateCardSwap] Swap complete - Index {first} now has value {spawnedCards[first].Value}, Index {second} now has value {spawnedCards[second].Value}");
 
         // Re-enable layout group
         if (layoutGroup != null)
         {
             layoutGroup.enabled = true;
-            Debug.Log("[SkillAnimateCardSwap] Layout group re-enabled");
+            //Debug.Log("[SkillAnimateCardSwap] Layout group re-enabled");
         }
 
         // Mark swap finished
@@ -623,7 +623,7 @@ public class GameManager : MonoBehaviour
         }
 
         Card cardToDelete = spawnedCards[index];
-        Debug.Log($"DeleteCard: Deleting card at index {index} with value {cardToDelete.Value}");
+        //Debug.Log($"DeleteCard: Deleting card at index {index} with value {cardToDelete.Value}");
 
         // Remove from the list
         spawnedCards.RemoveAt(index);
@@ -632,7 +632,7 @@ public class GameManager : MonoBehaviour
         // Destroy the GameObject
         Destroy(cardToDelete.gameObject);
 
-        Debug.Log($"DeleteCard: Card deleted. Remaining cards: {spawnedCards.Count}");
+        //Debug.Log($"DeleteCard: Card deleted. Remaining cards: {spawnedCards.Count}");
 
         // Re-enable layout group to automatically reposition remaining cards
         UnityEngine.UI.LayoutGroup layoutGroup = cardParent.GetComponent<UnityEngine.UI.LayoutGroup>();
@@ -640,7 +640,7 @@ public class GameManager : MonoBehaviour
         {
             layoutGroup.enabled = false;
             layoutGroup.enabled = true;
-            Debug.Log("DeleteCard: Layout group refreshed to fill gap from right");
+            //Debug.Log("DeleteCard: Layout group refreshed to fill gap from right");
         }
     }
     //When Succeeded
@@ -691,7 +691,7 @@ public class GameManager : MonoBehaviour
         // Activate skills after advancing to next stage
         if (skillLayout != null)
         {
-            Debug.Log("Activating skills for new stage");
+            //Debug.Log("Activating skills for new stage");
             isActivatingSkills = true;
             skillLayout.ActivateSkill();
             isActivatingSkills = false;

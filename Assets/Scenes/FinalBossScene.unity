@@ -1076,7 +1076,7 @@ MonoBehaviour:
   stageClearText: {fileID: 1807868359}
   startingCardCount: 4
   isActivatingSkills: 0
-  backgroundClip: {fileID: 8300000, guid: 835ffc178f2c6af4188088fa7bddbc4f, type: 3}
+  backgroundClip: {fileID: 8300000, guid: b110faf7e58343144a4ee9547c6ae39a, type: 3}
   cardClip:
   - {fileID: 8300000, guid: 31b113ce7b161b44998675a3e7268a21, type: 3}
   - {fileID: 8300000, guid: 4fbec229ef65c344ca8ed980f5446214, type: 3}

@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: PlayerData
   m_EditorClassIdentifier: 
   PlayerHandRange: 1
+  firstStageData: {fileID: 11400000, guid: f6752c4ab966bf445a25f04a286ea5ca, type: 2}
   SkillHand: 0
   goldAmount: 100
-  playerHealth: 2
+  playerHealth: 3
   isMove: 0
-  ownedSkills:
-  - {fileID: 5917684723483882544, guid: fe0592fd56a4b3b4cb2589db603fa13d, type: 3}
+  ownedSkills: []
   ownedSkillCount: 5
