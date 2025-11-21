@@ -13,17 +13,18 @@ MonoBehaviour:
   m_Name: FirstStageData
   m_EditorClassIdentifier: 
   state: 0
-  currentStage: 1
+  currentStage: 3
   currentRound: 1
   Stage: 0
   MaxStage: 3
   stageEnd: 6
-  cardSize: 0400000005000000060000000700000008000000
+  cardSize: 040000000500000006000000070000000800000007000000
   isBoss: 0
   timeLimits:
   - 10
   - 10
   - 12
-  - 13
-  - 13
-  stageSuccess: 1
+  - 14
+  - 14
+  - 11
+  stageSuccess: 0

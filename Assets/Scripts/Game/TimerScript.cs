@@ -9,6 +9,8 @@ public class TimerScript : MonoBehaviour
     [SerializeField] private float timeLimit;
     [SerializeField] private TMP_Text timerText;
     [SerializeField] GameManager gameManager;
+
+    [SerializeField] BossGameManager bossGameManager;
     public FirstStageData firstStageData;
     public bool startTimer;
     public bool timeisUp;
@@ -90,6 +92,14 @@ public class TimerScript : MonoBehaviour
         Debug.Log("TimerScript: Time is up! Player has failed the stage.");
         startTimer = false;
         timeisUp = true;
-        gameManager.FailedtoComplete();
+        
+        if (gameManager != null)
+        {
+            gameManager.FailedtoComplete();
+        }
+        else if (bossGameManager != null)
+        {
+            bossGameManager.FailedtoComplete();
+        }
     }
 }

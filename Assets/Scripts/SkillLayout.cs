@@ -148,7 +148,7 @@ public class SkillLayout : MonoBehaviour
         StartCoroutine(ActivateSkillsWithDelay());
     }
 
-    // Coroutine to activate all scripts with 0.5 second delay between each
+    // Coroutine to activate all scripts with delay between each
     private IEnumerator ActivateSkillsWithDelay()
     {
         // Disable input during skill activation
@@ -173,8 +173,27 @@ public class SkillLayout : MonoBehaviour
             Debug.Log($"SkillLayout: Activated skill {i + 1}/{scriptList.Count} - {script.GetType().Name}");
             activatedCount++;
 
-            // Wait 1.5 seconds before activating the next script
-            yield return new WaitForSeconds(2f);
+            // Wait until isActive becomes false (skill completes and sets it back to false)
+            float timeout = 10f; // Maximum wait time of 10 seconds per skill
+            float elapsedTime = 0f;
+            
+            while (GetIsActive(script) && elapsedTime < timeout)
+            {
+                yield return new WaitForSeconds(0.1f);
+                elapsedTime += 0.1f;
+            }
+            
+            if (elapsedTime >= timeout)
+            {
+                Debug.LogWarning($"SkillLayout: Skill {script.GetType().Name} timed out after {timeout} seconds.");
+            }
+            else
+            {
+                Debug.Log($"SkillLayout: Skill {script.GetType().Name} completed.");
+            }
+            
+            // Small delay before next skill
+            yield return new WaitForSeconds(0.3f);
         }
 
         Debug.Log($"SkillLayout: Activated {activatedCount} total skills.");
@@ -244,5 +263,25 @@ public class SkillLayout : MonoBehaviour
 		}
 
 		Debug.LogWarning($"SkillLayout: Component {type.Name} has no public bool isActive to set.");
+	}
+
+	// Helper: get isActive value via property or field
+	private static bool GetIsActive(MonoBehaviour component)
+	{
+		var type = component.GetType();
+
+		var prop = type.GetProperty("isActive", BindingFlags.Public | BindingFlags.Instance);
+		if (prop != null && prop.CanRead && prop.PropertyType == typeof(bool))
+		{
+			return (bool)prop.GetValue(component, null);
+		}
+
+		var field = type.GetField("isActive", BindingFlags.Public | BindingFlags.Instance);
+		if (field != null && field.FieldType == typeof(bool))
+		{
+			return (bool)field.GetValue(component);
+		}
+
+		return false;
 	}
 }

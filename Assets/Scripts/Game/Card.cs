@@ -21,11 +21,13 @@ public class Card : MonoBehaviour
     public TMP_Text numberText;
     private Button button;
     private GameManager gameManager;
+    private BossGameManager bossGameManager;
     [SerializeField] private GameObject outLine;
     [SerializeField] private Image cardImage; // Main card background image
     void Awake()
     {
         gameManager = FindObjectOfType<GameManager>();
+        bossGameManager = FindObjectOfType<BossGameManager>();
         button = GetComponent<Button>();
         if (button != null)
         {
@@ -62,6 +64,10 @@ public class Card : MonoBehaviour
         if (gameManager != null)
         {
             gameManager.OnItemClicked(gameObject);
+        }
+        else if (bossGameManager != null)
+        {
+            bossGameManager.OnItemClicked(gameObject);
         }
         else
         {

@@ -893,7 +893,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 11400000, guid: f6752c4ab966bf445a25f04a286ea5ca, type: 2}
-        m_TargetAssemblyTypeName: StageData, Assembly-CSharp
+        m_TargetAssemblyTypeName: FirstStageData, Assembly-CSharp
         m_MethodName: SetStateToRest
         m_Mode: 1
         m_Arguments:

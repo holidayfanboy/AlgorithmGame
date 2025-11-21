@@ -24,9 +24,6 @@ public class SoundData : ScriptableObject
     }
     
     public GameObject SoundObjectPrefab;
-    public AudioClip attackClip;
-    public AudioClip hurtClip;
-    public AudioClip deathClip;
 
     public static void PlaySoundFXClip(AudioClip clip, Vector3 soundPos, float volume)
     {

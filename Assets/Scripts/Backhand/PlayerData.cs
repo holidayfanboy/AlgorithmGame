@@ -6,6 +6,8 @@ using System.Collections.Generic;
 public class PlayerData : ScriptableObject
 {
     [SerializeField] private int PlayerHandRange;
+
+    [SerializeField] private FirstStageData firstStageData;
     public int SkillHand;
     public int goldAmount;
     public int playerHealth;
@@ -13,7 +15,7 @@ public class PlayerData : ScriptableObject
     public List<GameObject> ownedSkills = new List<GameObject>();
     public int ownedSkillCount;
     
-    private static bool hasInitialized = false;
+    private bool hasInitialized = false;
     public void ActivateMove()
     {
         isMove = true;
@@ -26,6 +28,10 @@ public class PlayerData : ScriptableObject
     
     private void OnEnable()
     {
+        if (firstStageData.currentStage == 1)
+        {
+            hasInitialized = false;
+        }
         isMove = false;
         // Only initialize once when the game first starts
         if (!hasInitialized)

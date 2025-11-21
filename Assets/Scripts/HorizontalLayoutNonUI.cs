@@ -6,7 +6,7 @@ public class HorizontalLayoutNonUI : MonoBehaviour
 {
     [SerializeField] private float startX = -5.5f;
     [SerializeField] private float endX = 5.8f;
-    [SerializeField] private float spacing = 0f; // Optional: additional spacing between objects
+    // [SerializeField] private float spacing = 0f; // Optional: additional spacing between objects
     [SerializeField] private GameObject enemyObject;
     [SerializeField] private GameManager gameManager;
     [SerializeField] private List<GameObject> spawnedEnemies = new List<GameObject>();

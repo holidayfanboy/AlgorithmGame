@@ -6,7 +6,7 @@ using System.Collections;
 using UnityEngine.UI;
 using TMPro;
 
-public class GameManager : MonoBehaviour
+public class BossGameManager : MonoBehaviour
 {
     [SerializeField] private GameObject cardPrefab;
     [SerializeField] private Transform cardParent;
@@ -14,20 +14,20 @@ public class GameManager : MonoBehaviour
     [SerializeField] private FirstStageData stageData;
     [SerializeField] private SkillLayout skillLayout;
     [SerializeField] private EnemyData enemyData;
-    [SerializeField] private HorizontalLayoutNonUI horizontalLayout;
     [SerializeField] private TimerScript timerScript;
-    [SerializeField] private PlayerScript playerScript;
+    [SerializeField] private BossPlayerScript playerScript;
+    [SerializeField] private FirstBoss bossScript;
     [SerializeField] private TMP_Text stageClearText;
     public int startingCardCount = 4;
     public bool isActivatingSkills = false;
-    [SerializeField] private List<AudioClip> backgroundClip;
+    [SerializeField] private AudioClip backgroundClip;
     [SerializeField] private List<AudioClip> cardClip;
     [SerializeField] private AudioClip stageclearClip;
     public List<int> numbers = new List<int>();
     public List<Card> spawnedCards = new List<Card>();
     [SerializeField] private int firstCardIndex;
     [SerializeField] private int secondCardIndex;
-    [SerializeField] private float cardSwapDuration = 1f; 
+    [SerializeField] private float cardSwapDuration = 0.5f; 
     [SerializeField] private int Stage;
     public bool isSwapping = false;
     public int timePlayed;
@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
 
     public int stageClearGold = 10;
     public int gameClearGold = 30;
+    public int bossHealth = 4;
     
     private bool freeHandSwapActive = false;
     private int originalHandRange = 0;
@@ -46,14 +47,14 @@ public class GameManager : MonoBehaviour
         // start first round
         if (stageData != null)
             startingCardCount = stageData.GiveCardSize(); // ADDED: get from FirstStageData
-        SoundData.PlaySoundFXClip(backgroundClip.ToArray(), transform.position, 0.13f);
+        
+        SoundData.PlaySoundFXClip(backgroundClip, transform.position, 0.13f);
         freeHandSwapActive = false;
         UpdateGold(0);
         UpdateHealth(0);
         firstCardIndex = -1;
         secondCardIndex = -1;
         ShuffleAndSpawn(startingCardCount); // unchanged call, now uses updated startingCardCount
-        horizontalLayout.SpawnEnemy(startingCardCount);
         if (playerData == null)
         {
             Debug.LogError("PlayerData ScriptableObject not assigned to GameManager!");
@@ -96,7 +97,6 @@ public class GameManager : MonoBehaviour
             if (spawnedCards[i] != null)
                 Destroy(spawnedCards[i].gameObject);
         }
-
         spawnedCards.Clear();
         numbers.Clear();
     }
@@ -344,7 +344,6 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator AnimateCardSwap(int firstIndex, int secondIndex)
     {
-        horizontalLayout.EnemySwap(firstIndex, secondIndex);
         
         // Play card swap sound
         if (cardClip != null && cardClip.Count > 0)
@@ -435,20 +434,8 @@ public class GameManager : MonoBehaviour
     public void FailedtoComplete()
     {
         Debug.Log("GameManager: Player failed to complete the stage in time.");
-        if (Stage >= stageData.MaxStage)
-        {
-            Debug.Log("Round Completed! Maximum Stage Reached.");
-            StartCoroutine(AttackThenContinue(true));
-            return;
-        }
-        else
-        {
-            Stage++;
-            if (stageData != null)
-            startingCardCount = stageData.GiveCardSize();
-            StartCoroutine(AttackThenContinue());
-        }
-       
+        // In boss battle, just retry without advancing stages
+        StartCoroutine(AttackThenContinue());
     }
 
     public void CheckForWin()
@@ -650,23 +637,37 @@ public class GameManager : MonoBehaviour
         isSwapping = true;
         isActivatingSkills = true;
         
-        stageData.SetStageSuccess();
+        // Decrease boss health instead of setting stage success
+        bossHealth--;
+        Debug.Log($"Boss Health decreased to: {bossHealth}");
+        
         timerScript.StopTimer();
         
-            playerScript.StartAttack();
-            yield return StartCoroutine(playerScript.WaitForAttackAnimation());
+        playerScript.StartAttack();
+        bossScript.StartHurt();   
+        yield return StartCoroutine(playerScript.WaitForAttackAnimation());
+        playerScript.Idle();
 
+        // Check if boss is defeated
+        if (bossHealth <= 0)
+        {
+            Debug.Log("Boss defeated! Changing scene...");
+            
+            // Enable stage clear text
+            if (stageClearText != null)
+            {
+                stageClearText.gameObject.SetActive(true);
+            }
+            
+            // Wait 2 seconds before changing scene
+            yield return new WaitForSeconds(2f);
+            
+            // Change to victory/shop scene
+            UnityEngine.SceneManagement.SceneManager.LoadScene("ShopScene");
+            yield break;
+        }
         
-
-        enemyData.ActivateDeath();
-
-        yield return new WaitForSeconds(2f);
-        
-
-            playerScript.Idle();
-
-        enemyData.DeactivateDeath();
-        
+        // If boss still alive, continue to next round
         // If this was the final stage/round, go to shop after finishing the attack/death sequence
         if (goToShopAtEnd)
         {
@@ -683,7 +684,6 @@ public class GameManager : MonoBehaviour
             yield break;
         }
 
-        horizontalLayout.SpawnEnemy(startingCardCount);
         playerData.ActivateMove();
         yield return new WaitForSeconds(4f);
         ShuffleAndSpawn(startingCardCount);
@@ -710,19 +710,12 @@ public class GameManager : MonoBehaviour
         stageData.SetStageFail();
         timerScript.StopTimer();
         
+        playerScript.StartHurt();
+        bossScript.StartAttack();        
 
-            playerScript.StartAttack();
-            yield return StartCoroutine(playerScript.WaitForAttackAnimation());
+        yield return new WaitForSeconds(1f);
         
-
-
-        enemyData.ActivateDeath();
-
-        yield return new WaitForSeconds(2f);
-        
-            playerScript.Idle();
-
-        enemyData.DeactivateDeath();
+        playerScript.Idle();        
         
         // If this was the final stage/round, apply fail penalty and go to shop after sequence
         if (goToShopAtEnd)
@@ -741,7 +734,8 @@ public class GameManager : MonoBehaviour
             stageData.SetStateToShop();
             yield break;
         }
-        horizontalLayout.SpawnEnemy(startingCardCount);
+        
+        // Don't advance stage, just respawn cards for retry
         playerData.ActivateMove(); 
         yield return new WaitForSeconds(2f);
         ShuffleAndSpawn(startingCardCount);
@@ -849,7 +843,6 @@ public class GameManager : MonoBehaviour
         }
         
         ShuffleAndSpawn(startingCardCount);
-        horizontalLayout.SpawnEnemy(startingCardCount);
         
         Debug.Log("GameManager: Game reset complete");
     }
@@ -865,4 +858,3 @@ public class GameManager : MonoBehaviour
     #endif
     }
 }
-  

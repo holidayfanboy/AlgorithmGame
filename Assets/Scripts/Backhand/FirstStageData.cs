@@ -8,7 +8,7 @@ public class FirstStageData : ScriptableObject
 {
     public enum State
     {
-        game, shop, rest
+        game, shop, rest, boss
     }
     public State state;
     public int currentStage;
@@ -79,9 +79,12 @@ public class FirstStageData : ScriptableObject
 
     private void InitializeDefaultValues()
     {
-        // Initialize default values when the asset is created
+        //Initialize default values when the asset is created
         state = State.game;
         currentStage = 1;
+        // state = State.boss;
+        // isBoss = true;
+        // currentStage = 6;
         currentRound = 1;
         MaxStage = 3;
         stageEnd = 6;
@@ -106,6 +109,12 @@ public class FirstStageData : ScriptableObject
         ChangeScene();
     }
 
+    public void SetStateToBoss()
+    {
+        state = State.boss;
+        ChangeScene();
+    }
+
     public void SetStateToRest()
     {
         state = State.rest;
@@ -120,6 +129,14 @@ public class FirstStageData : ScriptableObject
 
     private void ChangeScene()
     {
+        // Check if currentStage is 6 and state is rest, then go to boss scene
+        if (currentStage == 6 && state == State.rest)
+        {
+            state = State.boss;
+            isBoss = true;
+            Debug.Log("StageData: Stage 6 reached from Rest - Setting to Boss state");
+        }
+        
         switch (state)
         {
             case State.game:
@@ -133,6 +150,10 @@ public class FirstStageData : ScriptableObject
             case State.rest:
                 Debug.Log("StageData: Loading RestScene");
                 SceneManager.LoadScene("RestScene");
+                break;
+            case State.boss:
+                Debug.Log("StageData: Loading BossScene");
+                SceneManager.LoadScene("FinalBossScene");
                 break;
             default:
                 Debug.LogWarning("StageData: Unknown state");
